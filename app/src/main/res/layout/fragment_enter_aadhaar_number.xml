@@ -37,7 +37,7 @@
                 android:hint="@string/ben_mobile_num"
                 android:inputType="number"
                 android:maxLength="10"
-                android:text="@={model.beneficiaryMobileNumber}" />
+                android:text="@{model.abhaRequestModel.mobileNumber}" />
         </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -62,7 +62,7 @@
                 android:hint="@string/ben_aadhar_num"
                 android:inputType="number"
                 android:maxLength="16"
-                android:text="@={model.beneficiaryAadhaarNumber}" />
+                android:text="@={model.abhaRequestModel.aadhaarNumber}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.constraintlayout.widget.Guideline

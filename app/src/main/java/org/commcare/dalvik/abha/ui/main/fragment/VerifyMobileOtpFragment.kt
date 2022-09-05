@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
 
-class VerifyMobileOtpFragment : BaseFragment<VerifyMobileOtpBinding>(VerifyMobileOtpBinding::inflate) {
+class VerifyMobileOtpFragment :
+    BaseFragment<VerifyMobileOtpBinding>(VerifyMobileOtpBinding::inflate) {
 
     val uiState = MutableStateFlow<VerifyOtpUiState>(VerifyOtpUiState.DataInvalid)
 
@@ -25,16 +26,16 @@ class VerifyMobileOtpFragment : BaseFragment<VerifyMobileOtpBinding>(VerifyMobil
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        when(view?.id){
-            R.id.resentOtp ->{
-
+        when (view?.id) {
+            R.id.resentOtp -> {
+                binding.verifyOtp.isEnabled = false
             }
 
-            R.id.verifyOtp->{
-                val mode =  arguments?.getString("mode")
-                if(mode == null) {
+            R.id.verifyOtp -> {
+                val mode = arguments?.getString("mode")
+                if (mode == null) {
                     findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_verifyAadhaarOtpFragment)
-                }else{
+                } else {
                     findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaVerificationResultFragment)
                 }
             }
@@ -44,8 +45,8 @@ class VerifyMobileOtpFragment : BaseFragment<VerifyMobileOtpBinding>(VerifyMobil
 }
 
 sealed class VerifyMode {
-    object MobileOTP:VerifyMode()
-    object AadhaarOTP :VerifyMode()
+    object MobileOTP : VerifyMode()
+    object AadhaarOTP : VerifyMode()
 }
 
 sealed class VerifyOtpUiState {
@@ -54,4 +55,5 @@ sealed class VerifyOtpUiState {
     object Error : VerifyOtpUiState()
     object DataValidated : VerifyOtpUiState()
     object DataInvalid : VerifyOtpUiState()
+    object VerifyOtpBlocked : VerifyOtpUiState()
 }

@@ -30,6 +30,7 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/otpEt"
+                style="@style/EditTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_mobile_otp"
@@ -52,7 +53,7 @@
 
         <Button
             android:id="@+id/resentOtp"
-            style="@style/Widget.Material3.Button.IconButton.Filled"
+            style="@style/RoundStyleButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -64,7 +65,7 @@
 
         <Button
             android:id="@+id/verifyOtp"
-            style="@style/Widget.Material3.Button.IconButton.Filled"
+            style="@style/RoundStyleButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_16dp"

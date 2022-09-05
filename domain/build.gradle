@@ -20,7 +20,9 @@ java {
 
 
 dependencies {
+    api "com.squareup.retrofit2:converter-gson:$GSON_VERSION"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINE_CORE"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$COROUTINE_ANDROID"
     api "com.google.dagger:hilt-android:$HILT_VERSION"
+    api "androidx.lifecycle:lifecycle-livedata-ktx:$ANDROID_X_LIFE_CYCLE_VERSION"
 }
