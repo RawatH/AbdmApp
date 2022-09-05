@@ -22,6 +22,5 @@ java {
 dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINE_CORE"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$COROUTINE_ANDROID"
-
     api "com.google.dagger:hilt-android:$HILT_VERSION"
 }

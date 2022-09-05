@@ -4,7 +4,6 @@ import android.graphics.Typeface
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.textfield.TextInputEditText
-import org.commcare.dalvik.data.network.HeaderInterceptor
 
 
 fun TextInputEditText.checkMobileFirstNumber():Boolean{

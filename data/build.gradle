@@ -29,6 +29,7 @@ dependencies {
     api "com.squareup.retrofit2:converter-jackson:$RETROFIT_VERSION"
     api "com.squareup.retrofit2:adapter-rxjava2:$RETROFIT_VERSION"
     api "com.google.dagger:hilt-android:$HILT_VERSION"
+    implementation project(path: ':domain')
 
 
 }

@@ -11,6 +11,7 @@ import org.commcare.dalvik.data.network.NetworkUtil
 import org.commcare.dalvik.data.services.HqServices
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -25,8 +26,10 @@ object NetworkModule {
 
     @Provides
     fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
-       return OkHttpClient
+        return OkHttpClient
             .Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(httpLoggingInterceptor)
             .addInterceptor(HeaderInterceptor())
             .build()

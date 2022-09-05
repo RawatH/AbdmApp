@@ -11,6 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.EnterAadhaarBinding
+import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.checkMobileFirstNumber
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
@@ -77,6 +78,7 @@ class EnterAadhaarNumberFragment :BaseFragment<EnterAadhaarBinding>(EnterAadhaar
                         binding.generateOtp.isEnabled = true
                         binding.progressBar.visibility = View.GONE
                         binding.aadharNumberEt.isEnabled = true
+                        DialogUtility.showDialog(requireContext(),it.errorMsg)
                     }
                 }
             }
