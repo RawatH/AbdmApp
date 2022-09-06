@@ -31,7 +31,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/otpEt"
+                android:id="@+id/mobileOtpEt"
                 style="@style/EditTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,6 +61,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="24dp"
             android:layout_marginBottom="2dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/resentOtp"
             app:layout_constraintEnd_toEndOf="@+id/resentOtp"
             app:layout_constraintTop_toTopOf="@+id/resentOtp" />

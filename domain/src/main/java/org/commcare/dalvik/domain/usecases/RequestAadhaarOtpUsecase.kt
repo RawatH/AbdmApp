@@ -4,9 +4,9 @@ import org.commcare.dalvik.domain.repositories.AbdmRepository
 import javax.inject.Inject
 
 
-class RequestAadhaarOtpUsecase @Inject constructor() {
+class RequestAadhaarOtpUsecase @Inject constructor(val repository: AbdmRepository) {
 
-    suspend fun execute(aadhaarNumber: String, repository: AbdmRepository) {
+     fun execute(aadhaarNumber: String)  =
         repository.generateAadhaarOtp(aadhaarNumber)
-    }
+
 }

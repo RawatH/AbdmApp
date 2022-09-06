@@ -4,11 +4,10 @@ import android.util.Log
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.emitAll
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.PropMutableLiveData
@@ -111,10 +110,11 @@ class GenerateAbhaViewModel @Inject constructor(
     }
 
     /**
-     * Resent Mobile OTP request
+     * Resend Mobile OTP request
      */
     fun resendMobileOtpRequest() {
-        viewModelScope.launch(Dispatchers.Main) {
+        GlobalScope.launch(Dispatchers.Main) {
+            uiState.emit(GenerateAbhaUiState.MobileOtpRequested)
             uiState.emit(GenerateAbhaUiState.MobileOtpRequested)
             uiState.emit(GenerateAbhaUiState.Loading(true))
 
@@ -138,11 +138,49 @@ class GenerateAbhaViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Verify Mobile OTP
+     */
     fun verifyMobileOtp(){
 
     }
+
+    /**
+     * Resend Aadhaar OTP request
+     */
+    fun resendAadhaarOtpRequest(){
+        viewModelScope.launch(Dispatchers.Main) {
+            uiState.emit(GenerateAbhaUiState.AadhaarOtpRequested)
+
+            uiState.emit(GenerateAbhaUiState.Loading(true))
+            delay(2000)
+            uiState.emit(GenerateAbhaUiState.Error("",RequestType.AADHAAR_OTP_RESEND))
+
+
+            reqAadhaarOtpUsecase.execute(abhaRequestModel.value!!.aadhaarNumber).collect{
+
+                when(it){
+                    is HqResponseModel.Loading->{
+                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                    }
+                    is HqResponseModel.Success->{
+                        uiState.emit(GenerateAbhaUiState.Success("" ,RequestType.AADHAAR_OTP_RESEND))
+                    }
+                    is HqResponseModel.Error->{
+                        uiState.emit(GenerateAbhaUiState.Error("",RequestType.AADHAAR_OTP_RESEND))
+                    }
+                }
+            }
+
+//            saveData(PrefKeys.OTP_BLOCKED_TS.getKey(), System.currentTimeMillis().toString())
+
+        }
+    }
 }
 
+/**
+ * UI State
+ */
 sealed class GenerateAbhaUiState {
     data class Loading(val isLoading:Boolean) : GenerateAbhaUiState()
     object ValidState : GenerateAbhaUiState()
@@ -156,7 +194,12 @@ sealed class GenerateAbhaUiState {
     data class Error(val errorMsg:String, val requestType: RequestType) : GenerateAbhaUiState()
 }
 
+/**
+ * Request type sent
+ */
 enum class RequestType{
     MOBILE_OTP_RESEND ,
-    MOBILE_OTP_VERIFIED
+    MOBILE_OTP_VERIFY,
+    AADHAAR_OTP_RESEND,
+    AADHAAR_OTP_VERIFY
 }

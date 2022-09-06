@@ -10,7 +10,7 @@
     <string name="ben_aadhar_num">Beneficiary Aadhaar Number</string>
     <string name="ben_abha_num">Beneficiary ABHA Number</string>
     <string name="gen_otp">Generate OTP</string>
-    <string name="resent_otp">Resent OTP</string>
+    <string name="resent_otp">Resend OTP</string>
     <string name="abha_creation">ABHA Creation</string>
     <string name="returnn">Return</string>
     <string name="adhar_consent">Use Aadhaar data in Commcare</string>

@@ -37,9 +37,4 @@ abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflate
 
     }
 
-    fun observeText(et:TextInputEditText){
-
-    }
-
-
 }

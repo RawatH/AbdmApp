@@ -3,14 +3,18 @@ package org.commcare.dalvik.abha.ui.main.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
 import org.commcare.dalvik.abha.ui.main.custom.ProgressState
+import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
@@ -23,7 +27,6 @@ class VerifyMobileOtpFragment :
 
     private val viewModel: GenerateAbhaViewModel by activityViewModels()
 
-
     private val TAG = "VerifyMobileOtpFragment"
 
 
@@ -35,44 +38,48 @@ class VerifyMobileOtpFragment :
         observeUiState()
 
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.otpEt.observeText().collect {
-                binding.verifyOtp.isEnabled = it > 4
+            binding.mobileOtpEt.observeText().collect {
+                binding.verifyOtp.isEnabled = it > AppConstants.MOBILE_OTP_LENGTH
             }
         }
     }
 
     fun observeUiState() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.uiState.collect {
-                when (it) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect {
+                    when (it) {
 
-                    GenerateAbhaUiState.InvalidState -> {
+                        GenerateAbhaUiState.InvalidState -> {
 
-                    }
-                    GenerateAbhaUiState.MobileOtpRequested -> {
-                        binding.resentOtp.isEnabled = false
-                    }
-                    is GenerateAbhaUiState.Success -> {
-                        when (it.requestType) {
-                            RequestType.MOBILE_OTP_RESEND -> {
-
-                            }
-                            RequestType.MOBILE_OTP_VERIFIED -> {
-                                navigateToNextScreen()
-                            }
                         }
-                        viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
-                    }
-                    is GenerateAbhaUiState.Error -> {
-                        when (it.requestType) {
-                            RequestType.MOBILE_OTP_RESEND -> {
-                                binding.timeProgress.startTimer()
-                            }
-                            RequestType.MOBILE_OTP_VERIFIED -> {
-                                navigateToNextScreen()
-                            }
+                        GenerateAbhaUiState.MobileOtpRequested -> {
+                            binding.resentOtp.isEnabled = false
                         }
-                        viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
+                        is GenerateAbhaUiState.Success -> {
+                            when (it.requestType) {
+                                RequestType.MOBILE_OTP_RESEND -> {
+
+                                }
+                                RequestType.MOBILE_OTP_VERIFY -> {
+                                    navigateToNextScreen()
+                                }
+                            }
+                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
+                        }
+                        is GenerateAbhaUiState.Error -> {
+                            when (it.requestType) {
+                                RequestType.MOBILE_OTP_RESEND -> {
+                                    binding.verifyOtp.isEnabled =
+                                        binding.mobileOtpEt.text?.isNotEmpty() ?: false
+                                    binding.timeProgress.startTimer()
+                                }
+                                RequestType.MOBILE_OTP_VERIFY -> {
+                                    navigateToNextScreen()
+                                }
+                            }
+                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
+                        }
                     }
                 }
             }
@@ -103,6 +110,7 @@ class VerifyMobileOtpFragment :
         super.onClick(view)
         when (view?.id) {
             R.id.resentOtp -> {
+                binding.verifyOtp.isEnabled = false
                 binding.resentOtp.isEnabled = false
                 viewModel.resendMobileOtpRequest()
             }
@@ -122,18 +130,4 @@ class VerifyMobileOtpFragment :
             findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaVerificationResultFragment)
         }
     }
-}
-
-sealed class VerifyMode {
-    object MobileOTP : VerifyMode()
-    object AadhaarOTP : VerifyMode()
-}
-
-sealed class VerifyOtpUiState {
-    object Loading : VerifyOtpUiState()
-    object Success : VerifyOtpUiState()
-    object Error : VerifyOtpUiState()
-    object DataValidated : VerifyOtpUiState()
-    object DataInvalid : VerifyOtpUiState()
-    object VerifyOtpBlocked : VerifyOtpUiState()
 }
