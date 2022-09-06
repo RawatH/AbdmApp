@@ -113,12 +113,12 @@ class GenerateAbhaViewModel @Inject constructor(
      * Resend Mobile OTP request
      */
     fun resendMobileOtpRequest() {
-        GlobalScope.launch(Dispatchers.Main) {
+        viewModelScope.launch(Dispatchers.Main) {
             uiState.emit(GenerateAbhaUiState.MobileOtpRequested)
             uiState.emit(GenerateAbhaUiState.MobileOtpRequested)
             uiState.emit(GenerateAbhaUiState.Loading(true))
 
-            reqMobileOtpUseCase.execute(abhaRequestModel.value!!.mobileNumber).collect{
+            reqMobileOtpUseCase.execute(abhaRequestModel.value?.mobileNumber ?: "12312321").collect{
 
                 when(it){
                     is HqResponseModel.Loading->{

@@ -65,7 +65,10 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
 
     fun inflateNavGraph() {
-        val bundle = bundleOf("mobile_num" to "9560833229" , "abdm_api_key"  to "1122333")
+        val bundle =
+//            bundleOf("abha_id" to "7560833229")
+            bundleOf("mobile_num" to "7560833229" , "abdm_api_key"  to "1122333")
+
         HeaderInterceptor.API_KEY = bundle.getString("abdm_api_key","11")
 
         intent.putExtras(bundle)

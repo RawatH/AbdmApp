@@ -39,6 +39,7 @@
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
             <AutoCompleteTextView
+                style="@style/Headline2"
                 android:id="@+id/authSelection"
                 android:hint="@string/select_auth"
                 android:layout_width="match_parent"
@@ -50,7 +51,7 @@
 
         <Button
             android:id="@+id/startVerfication"
-            style="@style/Widget.Material3.Button.IconButton.Filled"
+            style="@style/RoundStyleButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"

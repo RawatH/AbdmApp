@@ -14,6 +14,14 @@ class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.clickHandler = this
+        populateIntentData()
+    }
+
+    fun populateIntentData() {
+        arguments?.getString("abha_id")?.apply {
+            binding.abhaNumberEt.setText(this)
+        }
+
     }
 
     override fun onClick(view: View?) {
