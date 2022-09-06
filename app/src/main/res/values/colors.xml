@@ -12,4 +12,5 @@
     <color name="warning">#EEC200</color>
     <color name="error">#E73C27</color>
     <color name="success">#4ABA32</color>
+    <color name="info_color">#2196F3</color>
 </resources>

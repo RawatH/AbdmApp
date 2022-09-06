@@ -2,10 +2,15 @@ package org.commcare.dalvik.abha.ui.main.fragment
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
+import org.commcare.dalvik.abha.ui.main.custom.ProgressState
 
 class VerifyMobileOtpFragment :
     BaseFragment<VerifyMobileOtpBinding>(VerifyMobileOtpBinding::inflate) {
@@ -17,7 +22,22 @@ class VerifyMobileOtpFragment :
         super.onViewCreated(view, savedInstanceState)
 
         binding.clickHandler = this
+        observeOtpTimer()
+    }
 
+    fun observeOtpTimer(){
+        lifecycleScope.launch(Dispatchers.Main) {
+            binding.timeProgress.timestate.collect {
+                when (it) {
+                    ProgressState.TimeoutStarted -> {
+                        binding.resentOtp.isEnabled = false
+                    }
+                    ProgressState.TimeoutOver -> {
+                        binding.resentOtp.isEnabled = true
+                    }
+                }
+            }
+        }
     }
 
     override fun onFragmentReady() {
@@ -28,7 +48,7 @@ class VerifyMobileOtpFragment :
         super.onClick(view)
         when (view?.id) {
             R.id.resentOtp -> {
-                binding.verifyOtp.isEnabled = false
+                binding.timeProgress.startTimer()
             }
 
             R.id.verifyOtp -> {

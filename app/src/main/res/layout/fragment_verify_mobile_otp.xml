@@ -51,6 +51,18 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="@dimen/_16dp" />
 
+        <org.commcare.dalvik.abha.ui.main.custom.TimeProgressBar
+            android:id="@+id/timeProgress"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/resentOtp"
+            app:layout_constraintEnd_toEndOf="@+id/resentOtp"
+            app:layout_constraintHorizontal_bias="0.5"
+
+            app:layout_constraintTop_toTopOf="@+id/resentOtp" />
+
         <Button
             android:id="@+id/resentOtp"
             style="@style/RoundStyleButton"
