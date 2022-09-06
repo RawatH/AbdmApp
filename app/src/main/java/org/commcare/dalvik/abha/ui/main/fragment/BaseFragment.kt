@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.flow.callbackFlow
 
 abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflater: LayoutInflater) -> B) :
     Fragment(), View.OnClickListener {
@@ -32,6 +34,10 @@ abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflate
     abstract fun onFragmentReady()
 
     override fun onClick(view: View?) {
+
+    }
+
+    fun observeText(et:TextInputEditText){
 
     }
 

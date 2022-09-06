@@ -55,14 +55,14 @@
 
         <org.commcare.dalvik.abha.ui.main.custom.TimeProgressBar
             android:id="@+id/timeProgress"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_marginEnd="24dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginRight="24dp"
+            android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/resentOtp"
             app:layout_constraintEnd_toEndOf="@+id/resentOtp"
-            app:layout_constraintHorizontal_bias="0.5"
-
             app:layout_constraintTop_toTopOf="@+id/resentOtp" />
 
         <Button
@@ -82,6 +82,7 @@
             style="@style/RoundStyleButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:layout_marginTop="@dimen/_16dp"
             android:onClickListener="@{clickHandler}"
             android:text="@string/verify"

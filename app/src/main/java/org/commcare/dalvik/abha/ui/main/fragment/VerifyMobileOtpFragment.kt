@@ -1,31 +1,30 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
 import org.commcare.dalvik.abha.ui.main.custom.ProgressState
+import org.commcare.dalvik.abha.utility.observeText
+import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.RequestType
 import org.commcare.dalvik.data.util.PrefKeys
 
 @AndroidEntryPoint
 class VerifyMobileOtpFragment :
     BaseFragment<VerifyMobileOtpBinding>(VerifyMobileOtpBinding::inflate) {
 
-    private val viewModel: GenerateAbhaViewModel by viewModels()
+    private val viewModel: GenerateAbhaViewModel by activityViewModels()
 
 
     private val TAG = "VerifyMobileOtpFragment"
-
-    val uiState = MutableStateFlow<VerifyOtpUiState>(VerifyOtpUiState.DataInvalid)
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,6 +32,51 @@ class VerifyMobileOtpFragment :
         binding.model = viewModel
         binding.clickHandler = this
         observeOtpTimer()
+        observeUiState()
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            binding.otpEt.observeText().collect {
+                binding.verifyOtp.isEnabled = it > 4
+            }
+        }
+    }
+
+    fun observeUiState() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewModel.uiState.collect {
+                when (it) {
+
+                    GenerateAbhaUiState.InvalidState -> {
+
+                    }
+                    GenerateAbhaUiState.MobileOtpRequested -> {
+                        binding.resentOtp.isEnabled = false
+                    }
+                    is GenerateAbhaUiState.Success -> {
+                        when (it.requestType) {
+                            RequestType.MOBILE_OTP_RESEND -> {
+
+                            }
+                            RequestType.MOBILE_OTP_VERIFIED -> {
+                                navigateToNextScreen()
+                            }
+                        }
+                        viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
+                    }
+                    is GenerateAbhaUiState.Error -> {
+                        when (it.requestType) {
+                            RequestType.MOBILE_OTP_RESEND -> {
+                                binding.timeProgress.startTimer()
+                            }
+                            RequestType.MOBILE_OTP_VERIFIED -> {
+                                navigateToNextScreen()
+                            }
+                        }
+                        viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
+                    }
+                }
+            }
+        }
     }
 
     fun observeOtpTimer() {
@@ -59,19 +103,23 @@ class VerifyMobileOtpFragment :
         super.onClick(view)
         when (view?.id) {
             R.id.resentOtp -> {
-                binding.timeProgress.startTimer()
-                viewModel.saveData(PrefKeys.OTP_BLOCKED_TS.getKey(),System.currentTimeMillis().toString())
+                binding.resentOtp.isEnabled = false
+                viewModel.resendMobileOtpRequest()
             }
 
             R.id.verifyOtp -> {
-                val mode = arguments?.getString("mode")
-                if (mode == null) {
-                    findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_verifyAadhaarOtpFragment)
-                } else {
-                    findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaVerificationResultFragment)
-                }
+                navigateToNextScreen()
             }
 
+        }
+    }
+
+    private fun navigateToNextScreen() {
+        val mode = arguments?.getString("mode")
+        if (mode == null) {
+            findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_verifyAadhaarOtpFragment)
+        } else {
+            findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaVerificationResultFragment)
         }
     }
 }
