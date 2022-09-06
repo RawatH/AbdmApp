@@ -1,23 +1,32 @@
 package org.commcare.dalvik.abha.viewmodel
 
+import android.util.Log
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.PropMutableLiveData
+import org.commcare.dalvik.data.repository.DataStoreRepositoryImpl
+import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.HqResponseModel
 import org.commcare.dalvik.domain.usecases.RequestAadhaarOtpUsecase
 import org.commcare.dalvik.domain.usecases.RequestMobileOtpUseCase
+import org.commcare.dalvik.domain.usecases.SaveDataUsecase
 import javax.inject.Inject
 
 @HiltViewModel
 class GenerateAbhaViewModel @Inject constructor(
     val reqAadhaarOtpUsecase: RequestAadhaarOtpUsecase,
-    val reqMobileOtpUseCase: RequestMobileOtpUseCase
+    val reqMobileOtpUseCase: RequestMobileOtpUseCase,
+    val saveDataUsecase: SaveDataUsecase
 ) : BaseViewModel() {
+
+    private val TAG = "GenerateAbhaViewModel"
 
     var abhaRequestModel: PropMutableLiveData<AbhaNumberRequestModel> = PropMutableLiveData()
 
@@ -55,7 +64,8 @@ class GenerateAbhaViewModel @Inject constructor(
     fun requestOtp() {
         viewModelScope.launch {
             val mobileOtpResponse = async {
-                val mobileOtpFlow = reqMobileOtpUseCase.execute(abhaRequestModel.value!!.mobileNumber)
+                val mobileOtpFlow =
+                    reqMobileOtpUseCase.execute(abhaRequestModel.value!!.mobileNumber)
                 mobileOtpFlow.collect {
                     when (it) {
                         is HqResponseModel.Success<String> -> {
@@ -83,6 +93,18 @@ class GenerateAbhaViewModel @Inject constructor(
 
 
         }
+    }
+
+    fun getData(key: Preferences.Key<String>) {
+        viewModelScope.launch {
+            saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey()).collect {
+                Log.d(TAG, "OTP TS : ${it}")
+            }
+        }
+    }
+
+    fun saveData(key: Preferences.Key<String>, value: String) {
+        saveDataUsecase.executeSave(value, key)
     }
 }
 

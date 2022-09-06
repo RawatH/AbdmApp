@@ -23,8 +23,6 @@ class TimeProgressBar @JvmOverloads constructor(
     val timestate:MutableStateFlow<ProgressState> = MutableStateFlow(ProgressState.TimeoutOver)
 
 
-    fun getMaxAllowedCount(): Int = pb.max
-
     init {
         inflate(getContext(), R.layout.number_progress, this)
         attrs?.let {
@@ -55,6 +53,7 @@ class TimeProgressBar @JvmOverloads constructor(
             }
             visibility = View.GONE
             timestate.emit(ProgressState.TimeoutOver)
+            pb.progress = pb.max
         }
     }
 }

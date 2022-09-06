@@ -12,17 +12,20 @@ import org.commcare.dalvik.data.services.HqServices
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    @Singleton
     @Provides
     fun provideHttpLogger(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BODY)
     }
 
+    @Singleton
     @Provides
     fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient
@@ -34,6 +37,7 @@ object AppModule {
             .build()
     }
 
+    @Singleton
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
 
@@ -44,6 +48,7 @@ object AppModule {
             .build()
     }
 
+    @Singleton
     @Provides
     fun provideHqServices(retrofit: Retrofit): HqServices {
         return retrofit.create(HqServices::class.java)

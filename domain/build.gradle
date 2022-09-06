@@ -24,5 +24,6 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINE_CORE"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$COROUTINE_ANDROID"
     api "com.google.dagger:hilt-android:$HILT_VERSION"
+    api "androidx.datastore:datastore-preferences:1.0.0"
     api "androidx.lifecycle:lifecycle-livedata-ktx:$ANDROID_X_LIFE_CYCLE_VERSION"
 }

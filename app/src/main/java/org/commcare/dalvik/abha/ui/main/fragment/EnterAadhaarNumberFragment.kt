@@ -7,13 +7,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.EnterAadhaarBinding
-import org.commcare.dalvik.abha.utility.DataStoreUtil
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.checkMobileFirstNumber
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
@@ -34,12 +30,6 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
     }
 
     fun populateIntentData() {
-        lifecycleScope.launch {
-            DataStoreUtil(requireContext()).saveToDataStore(
-                DataStoreUtil.OTP_BLOCKED_TS,
-                System.currentTimeMillis().toString()
-            )
-        }
         arguments?.getString("mobile_num")?.apply {
             viewModel.init(this)
             observeRequestModel()
@@ -87,16 +77,6 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                     }
 
                     is GenerateAbhaUiState.Error -> {
-                        lifecycleScope.launch {
-                            DataStoreUtil(requireContext()).getFromDataStore(DataStoreUtil.OTP_BLOCKED_TS)
-                                .catch { e -> e.printStackTrace() }
-                                .collect {
-                                    withContext(Dispatchers.Main) {
-                                        Log.d(TAG, "OTP BLOCKED TS : " + it)
-                                    }
-                                }
-
-                        }
                         Log.d(TAG, "XXXXXXXX" + it.errorMsg)
                         binding.generateOtp.isEnabled = true
                         binding.progressBar.visibility = View.GONE

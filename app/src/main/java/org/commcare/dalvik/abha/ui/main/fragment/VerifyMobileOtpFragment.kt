@@ -1,31 +1,41 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
 import org.commcare.dalvik.abha.ui.main.custom.ProgressState
+import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.data.util.PrefKeys
 
+@AndroidEntryPoint
 class VerifyMobileOtpFragment :
     BaseFragment<VerifyMobileOtpBinding>(VerifyMobileOtpBinding::inflate) {
+
+    private val viewModel: GenerateAbhaViewModel by viewModels()
+
+
+    private val TAG = "VerifyMobileOtpFragment"
 
     val uiState = MutableStateFlow<VerifyOtpUiState>(VerifyOtpUiState.DataInvalid)
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.model = viewModel
         binding.clickHandler = this
         observeOtpTimer()
     }
 
-    fun observeOtpTimer(){
+    fun observeOtpTimer() {
         lifecycleScope.launch(Dispatchers.Main) {
             binding.timeProgress.timestate.collect {
                 when (it) {
@@ -34,6 +44,7 @@ class VerifyMobileOtpFragment :
                     }
                     ProgressState.TimeoutOver -> {
                         binding.resentOtp.isEnabled = true
+                        viewModel.getData(PrefKeys.OTP_BLOCKED_TS.getKey())
                     }
                 }
             }
@@ -49,6 +60,7 @@ class VerifyMobileOtpFragment :
         when (view?.id) {
             R.id.resentOtp -> {
                 binding.timeProgress.startTimer()
+                viewModel.saveData(PrefKeys.OTP_BLOCKED_TS.getKey(),System.currentTimeMillis().toString())
             }
 
             R.id.verifyOtp -> {
