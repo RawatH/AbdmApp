@@ -19,4 +19,6 @@ ext {
     COROUTINE_CORE = "1.5.1"
     COROUTINE_ANDROID="1.6.1"
 
+    TIMBER_VER = "4.7.1"
+
 }

@@ -47,7 +47,7 @@ class TimeProgressBar @JvmOverloads constructor(
             timestate.emit(ProgressState.TimeoutStarted)
             visibility = View.VISIBLE
             while (pb.progress > 0){
-                delay(100)
+                delay(10)
                 pb.progress = pb.progress - 1
                 counterView.text = pb.progress.toString()
             }

@@ -18,5 +18,11 @@ class DataStoreRepositoryImpl @Inject constructor(val dsUtil: DataStoreUtil) : D
 
     override  fun getData(key: Preferences.Key<String>) = dsUtil.getFromDataStore(key)
 
+    override fun removeKey(key: Preferences.Key<String>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dsUtil.removeFromStore(key)
+        }
+    }
+
 
 }

@@ -88,4 +88,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINE_CORE"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$COROUTINE_ANDROID"
 
+    //TIMBER
+    implementation "com.jakewharton.timber:timber:$TIMBER_VER"
+
 }

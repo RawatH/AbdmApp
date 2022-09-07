@@ -1,10 +1,13 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -56,28 +59,31 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
 
     fun attachUiStateObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.uiState.collect {
-                when (it) {
-                    is GenerateAbhaUiState.Loading -> {
-                        binding.generateOtp.isEnabled = false
-                        binding.aadharNumberEt.isEnabled = false
-                    }
-                    is GenerateAbhaUiState.InvalidState -> {
-                        binding.generateOtp.isEnabled = false
-                    }
-                    is GenerateAbhaUiState.ValidState -> {
-                        binding.generateOtp.isEnabled = true
-                    }
-                    is GenerateAbhaUiState.Success -> {
-                        navigateToVerificationScreen()
-                        binding.generateOtp.isEnabled = true
-                    }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect {
+                    when (it) {
+                        is GenerateAbhaUiState.Loading -> {
+                            binding.generateOtp.isEnabled = !it.isLoading
+                            binding.aadharNumberEt.isEnabled = it.isLoading
+                        }
+                        is GenerateAbhaUiState.InvalidState -> {
+                            binding.generateOtp.isEnabled = false
+                        }
+                        is GenerateAbhaUiState.ValidState -> {
+                            binding.generateOtp.isEnabled = true
+                        }
+                        is GenerateAbhaUiState.Success -> {
+                            navigateToVerificationScreen()
+                            binding.generateOtp.isEnabled = true
+                        }
 
-                    is GenerateAbhaUiState.Error -> {
-                        Log.d(TAG, "XXXXXXXX" + it.errorMsg)
-                        binding.generateOtp.isEnabled = true
-                        binding.aadharNumberEt.isEnabled = true
-                        DialogUtility.showDialog(requireContext(), it.errorMsg + "")
+                        is GenerateAbhaUiState.Error -> {
+                            Log.d(TAG, "XXXXXXXX" + it.errorMsg)
+                            binding.generateOtp.isEnabled = true
+                            binding.aadharNumberEt.isEnabled = true
+                            DialogUtility.showDialog(requireContext(), it.errorMsg + "")
+                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
+                        }
                     }
                 }
             }

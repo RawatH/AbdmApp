@@ -21,10 +21,6 @@ class DataStoreUtil @Inject constructor(@ApplicationContext val context: Context
         name = USER_PREFERENCES_NAME
     )
 
-//    val OTP_BLOCKED_TS = stringPreferencesKey("OTP_BLOCKED_TS")
-//    val MOBILE_OTP_REQ_TS = stringPreferencesKey("MOBILE_OTP_REQ_TS")
-//    val AADHAAR_OTP_REQ_TS = stringPreferencesKey("AADHAAR_OTP_REQ_TS")
-//
 
     suspend fun saveToDataStore(prefKey: Preferences.Key<String>, prefValue: String) {
         context.dataStore.edit {
@@ -41,6 +37,12 @@ class DataStoreUtil @Inject constructor(@ApplicationContext val context: Context
     suspend fun clearDataStore() {
         context.dataStore.edit {
             it.clear()
+        }
+    }
+
+    suspend fun removeFromStore(prefKey: Preferences.Key<String>) {
+        context.dataStore.edit { preference ->
+            preference.remove(prefKey)
         }
     }
 

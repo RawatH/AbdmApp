@@ -9,12 +9,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
 import org.commcare.dalvik.abha.ui.main.custom.ProgressState
 import org.commcare.dalvik.abha.utility.AppConstants
+import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
@@ -49,6 +49,8 @@ class VerifyMobileOtpFragment :
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     when (it) {
+
+
 
                         GenerateAbhaUiState.InvalidState -> {
 
