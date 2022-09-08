@@ -2,6 +2,8 @@ package org.commcare.dalvik.data.repository
 
 import android.util.Log
 import kotlinx.coroutines.flow.Flow
+import org.commcare.dalvik.data.model.request.AadhaarModel
+import org.commcare.dalvik.data.model.request.MobileModel
 import org.commcare.dalvik.data.network.safeApiCall
 import org.commcare.dalvik.data.services.HqServices
 import org.commcare.dalvik.domain.model.HqResponseModel
@@ -18,15 +20,15 @@ class AbdmRepositoryImpl @Inject constructor(val hqServices: HqServices) : AbdmR
 
     }
 
-    override  fun generateMobileOtp(mobileNumber: String ): Flow<HqResponseModel<String>> =
+    override  fun generateMobileOtp(mobileModel: MobileModel): Flow<HqResponseModel<String>> =
         safeApiCall {
-            hqServices.generateMobileOtp(mobileNumber)
+            hqServices.generateMobileOtp(mobileModel)
         }
 
 
-    override  fun generateAadhaarOtp(aadharNumber: String) =
+    override  fun generateAadhaarOtp(aadhaarModel: AadhaarModel) =
         safeApiCall {
-            hqServices.generateAadhaarOtp(aadharNumber)
+            hqServices.generateAadhaarOtp(aadhaarModel)
         }
 
 

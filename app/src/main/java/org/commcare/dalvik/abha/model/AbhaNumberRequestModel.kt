@@ -7,11 +7,11 @@ import org.commcare.dalvik.abha.BR
 
 data class AbhaNumberRequestModel(val mobileNumber: String) : BaseObservable() {
 
-    var aadhaarNumber: String = ""
+    var aadhaar: String = ""
     @Bindable get
     set(value){
         field = value
-        notifyPropertyChanged(BR.aadhaarNumber)
+        notifyPropertyChanged(BR.aadhaar)
     }
 
 

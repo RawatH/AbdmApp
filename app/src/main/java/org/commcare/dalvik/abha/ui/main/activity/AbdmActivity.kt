@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.AbdmActivityBinding
 import org.commcare.dalvik.abha.utility.AppConstants
+import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
@@ -63,7 +64,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
                         val timeLeftStr = minutesLeft.toString()+"min : ${secondsLeft}sec"
                         DialogUtility.showDialog(this@AbdmActivity,
                             resources.getString(R.string.app_blocked,timeLeftStr) ,
-                            {dispatchResult()})
+                            {dispatchResult()},DialogType.Blocking)
                     }else{
                         viewmodel.clearBlockState()
                     }

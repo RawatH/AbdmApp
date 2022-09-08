@@ -4,7 +4,7 @@ class AppConstants {
     companion object{
         val MOBILE_OTP_LENGTH = 6
         val AADHAAR_OTP_LENGTH = 6
-        val AADHAR_NUMBER_LENGTH = 16
+        val AADHAR_NUMBER_LENGTH = 12
         val MOBILE_NUMBER_LENGTH = 10
 
         val OTP_BLOCK_TS = 15 * 60 * 1000

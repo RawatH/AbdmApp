@@ -7,7 +7,7 @@ import retrofit2.Response
 
 class NetworkUtil {
     companion object {
-        const val BASE_URL = "https://virtserver.swaggerhub.com/AKASHJ1708/Test/1.0.0/"
+        const val BASE_URL = "https://staging.commcarehq.org/abdm/api/"
     }
 }
 

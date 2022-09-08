@@ -1,6 +1,5 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -93,13 +92,14 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
 
     override fun onClick(view: View?) {
         super.onClick(view)
-//        viewModel.requestOtp()
-        navigateToVerificationScreen()
+        viewModel.requestOtp()
+//        navigateToVerificationScreen()
+//        DialogUtility.showDialog(requireContext(),"TEST",DialogType.Blocking)
     }
 
     fun navigateToVerificationScreen() {
 
-        findNavController().navigate(R.id.action_enterAbhaCreationDetailsFragment_to_verifyOtpFragment)
+        findNavController().navigate(R.id.action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment)
     }
 
 

@@ -21,8 +21,6 @@ import org.commcare.dalvik.data.util.PrefKeys
 
 class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadhaarOtpBinding::inflate) {
 
-    private  val TAG = "VerifyAadhaarOtpFrgment"
-
     private val viewModel: GenerateAbhaViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -124,6 +122,6 @@ class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadha
     }
 
     private fun navigateToNextScreen(){
-        findNavController().navigate(R.id.action_verifyAadhaarOtpFragment_to_abhaDetailFragment)
+        findNavController().navigate(R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment)
     }
 }

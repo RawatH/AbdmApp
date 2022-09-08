@@ -27,8 +27,6 @@ class VerifyMobileOtpFragment :
 
     private val viewModel: GenerateAbhaViewModel by activityViewModels()
 
-    private val TAG = "VerifyMobileOtpFragment"
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -127,7 +125,7 @@ class VerifyMobileOtpFragment :
     private fun navigateToNextScreen() {
         val mode = arguments?.getString("mode")
         if (mode == null) {
-            findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_verifyAadhaarOtpFragment)
+            findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaDetailFragment)
         } else {
             findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaVerificationResultFragment)
         }
