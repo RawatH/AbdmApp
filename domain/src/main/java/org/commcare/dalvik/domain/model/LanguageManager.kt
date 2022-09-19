@@ -30,7 +30,6 @@ object LanguageManager {
     lateinit var translationModel: TranslationModel
 
 
-
     fun getTranslatedValue(key: TranslationKey) = translationModel.getTranslatedString(key.name)
 
     fun init() {
@@ -42,7 +41,20 @@ object LanguageManager {
 enum class TranslationKey {
     GEN_OTP,
     RESEND_OTP,
-    VERIFY
+    VERIFY,
+    BENF_MOB_NUM,
+    BENF_ADHR_NUM,
+    ENTER_ADHR_OTP,
+    START_VERIFICATION,
+    SEL_AUTH_METHOD,
+    VERIFICATION_STATUS,
+    STATUS,
+    RETURN,
+    ABHA_NUM,
+    ADHR_DATA,
+    USE_ADHR_DATA_IN_COMMCARE
+
+
 }
 
 enum class LanguageCode {
