@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import org.commcare.dalvik.data.network.NetworkUtil
 import org.commcare.dalvik.data.services.TranslationService
+import org.commcare.dalvik.domain.model.LanguageCode
 import org.commcare.dalvik.domain.model.LanguageManager
 import org.commcare.dalvik.domain.model.TranslationModel
 import org.commcare.dalvik.domain.repositories.TranslationRepository
@@ -13,9 +14,9 @@ import javax.inject.Inject
 
 class TranslationRepositoryImpl @Inject constructor(private val translationService: TranslationService) :
     TranslationRepository {
-    override suspend fun getTranslationData(langCode: String): TranslationModel? {
+    override suspend fun getTranslationData(langCode: LanguageCode): TranslationModel? {
         val job = CoroutineScope(Dispatchers.IO).async {
-            translationService.getTranslationData(NetworkUtil.getTranslationEndpoint(langCode)).body()
+            translationService.getTranslationData(NetworkUtil.getTranslationEndpoint(langCode.code)).body()
         }
 
         return job.await() ?: Gson().fromJson(

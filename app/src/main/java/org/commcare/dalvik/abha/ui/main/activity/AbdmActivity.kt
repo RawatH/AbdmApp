@@ -24,6 +24,8 @@ import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.data.network.HeaderInterceptor
 import org.commcare.dalvik.data.util.PrefKeys
+import org.commcare.dalvik.domain.model.LanguageCode
+import org.commcare.dalvik.domain.model.LanguageManager
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -50,7 +52,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         observeLoader()
         observeOtpFailure()
         checkForBlockScenario()
-        viewmodel.getTranslation("en")
+        viewmodel.getTranslation(LanguageCode.HI)
     }
 
     private fun checkForBlockScenario() {

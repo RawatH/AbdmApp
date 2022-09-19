@@ -57,7 +57,8 @@ enum class TranslationKey {
 
 }
 
-enum class LanguageCode {
-    EN
+enum class LanguageCode(val code: String){
+    EN("en") ,
+    HI ("hi");
 }
 

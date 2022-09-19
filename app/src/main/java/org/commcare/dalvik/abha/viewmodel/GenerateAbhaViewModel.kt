@@ -14,6 +14,7 @@ import org.commcare.dalvik.abha.utility.PropMutableLiveData
 import org.commcare.dalvik.data.services.HqServices
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.HqResponseModel
+import org.commcare.dalvik.domain.model.LanguageCode
 import org.commcare.dalvik.domain.model.LanguageManager
 import org.commcare.dalvik.domain.usecases.GetTranslationUseCase
 import org.commcare.dalvik.domain.usecases.RequestAadhaarOtpUsecase
@@ -253,7 +254,7 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Fetch Translations
      */
-    fun getTranslation(langCode: String) {
+    fun getTranslation(langCode: LanguageCode) {
         viewModelScope.launch(Dispatchers.IO) {
             translationUseCase.execute(langCode)?.let{
                 LanguageManager.translationModel = it
