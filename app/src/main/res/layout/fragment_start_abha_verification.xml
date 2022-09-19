@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data class="StartAbhaVerificationBinding">
+        <import type="org.commcare.dalvik.domain.model.TranslationKey"/>
         <variable
             name="clickHandler"
             type="org.commcare.dalvik.abha.ui.main.fragment.StartAbhaVerificationFragment" />
@@ -19,6 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:enabled="false"
+            app:translatedTextKey="@{TranslationKey.BENF_ABHA_NUM}"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toTopOf="parent">
@@ -28,10 +30,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/EditTextStyle"
+                app:translatedTextKey="@{TranslationKey.BENF_ABHA_NUM}"
                 android:maxLength="10"
                 android:inputType="number"
                 android:textColor="@color/black"
-                android:hint="@string/ben_abha_num" />
+                />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.constraintlayout.widget.Guideline
@@ -49,11 +52,11 @@
             app:layout_constraintGuide_end="@dimen/_16dp" />
 
         <Button
-            android:id="@+id/startVerfication"
+            android:id="@+id/startVerification"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="@string/start_verification"
+            app:translatedTextKey="@{TranslationKey.START_VERIFICATION}"
             android:onClickListener="@{clickHandler}"
             style="@style/RoundStyleButton"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"

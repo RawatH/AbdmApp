@@ -25,6 +25,7 @@
             android:layout_marginTop="16dp"
             app:endIconMode="clear_text"
             app:helperTextEnabled="true"
+            app:translatedTextKey="@{TranslationKey.ENTER_ADHR_OTP}"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"

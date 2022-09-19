@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
@@ -12,8 +11,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.AbdmActivityBinding
@@ -24,8 +21,7 @@ import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.data.network.HeaderInterceptor
 import org.commcare.dalvik.data.util.PrefKeys
-import org.commcare.dalvik.domain.model.LanguageCode
-import org.commcare.dalvik.domain.model.LanguageManager
+
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -52,7 +48,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         observeLoader()
         observeOtpFailure()
         checkForBlockScenario()
-        viewmodel.getTranslation(LanguageCode.HI)
+        viewmodel.getTranslation("hi")
     }
 
     private fun checkForBlockScenario() {

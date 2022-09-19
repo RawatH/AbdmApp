@@ -1,6 +1,8 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
@@ -80,7 +82,10 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                         }
 
                         is GenerateAbhaUiState.TranslationReceived ->{
-                           LanguageManager.translationModel
+                            Handler(Looper.getMainLooper()).post {
+                                binding.invalidateAll()
+                            }
+
                         }
                         is GenerateAbhaUiState.Error -> {
                             Log.d(TAG, "XXXXXXXX" + it.errorMsg)

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+  >
 
     <data class="VerifyMobileOtpBinding">
+        <import type="org.commcare.dalvik.domain.model.TranslationKey"/>
 
         <variable
             name="model"
@@ -25,6 +26,7 @@
             android:layout_marginTop="16dp"
             app:endIconMode="clear_text"
             app:helperTextEnabled="true"
+            app:translatedTextKey="@{TranslationKey.ENTER_MOB_OTP}"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
@@ -33,6 +35,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/mobileOtpEt"
                 style="@style/EditTextStyle"
+                app:translatedTextKey="@{TranslationKey.ENTER_MOB_OTP}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_mobile_otp"
@@ -73,7 +76,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:onClickListener="@{clickHandler}"
-            android:text="@string/resent_otp"
+            app:translatedTextKey="@{TranslationKey.RESEND_OTP}"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
             app:layout_constraintTop_toBottomOf="@+id/otpInputLayout" />
@@ -86,7 +89,7 @@
             android:enabled="false"
             android:layout_marginTop="@dimen/_16dp"
             android:onClickListener="@{clickHandler}"
-            android:text="@string/verify"
+            app:translatedTextKey="@{TranslationKey.VERIFY}"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
             app:layout_constraintTop_toBottomOf="@+id/resentOtp" />

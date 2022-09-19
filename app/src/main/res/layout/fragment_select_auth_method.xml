@@ -5,6 +5,7 @@
 
     <data class="SelectAuthMethodBinding">
 
+        <import type="org.commcare.dalvik.domain.model.TranslationKey"/>
         <variable
             name="clickHandler"
             type="org.commcare.dalvik.abha.ui.main.fragment.SelectAuthenticationFragment" />
@@ -33,6 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            app:translatedTextKey="@{TranslationKey.SEL_AUTH_METHOD}"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toTopOf="parent"
@@ -41,7 +43,7 @@
             <AutoCompleteTextView
                 style="@style/Headline2"
                 android:id="@+id/authSelection"
-                android:hint="@string/select_auth"
+                app:translatedTextKey="@{TranslationKey.SEL_AUTH_METHOD}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
@@ -56,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:onClickListener="@{clickHandler}"
-            android:text="@string/gen_otp"
+            app:translatedTextKey="@{TranslationKey.GEN_OTP}"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
