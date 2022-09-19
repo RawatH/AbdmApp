@@ -1,12 +1,10 @@
 package org.commcare.dalvik.data.services
 
-import org.commcare.dalvik.data.model.request.AadhaarModel
+import org.commcare.dalvik.data.model.request.AadhaarOtpRequestModel
 import org.commcare.dalvik.data.model.request.MobileModel
 import org.json.JSONObject
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface HqServices {
 
@@ -14,7 +12,7 @@ interface HqServices {
     suspend fun generateMobileOtp(@Body mobileModel: MobileModel):Response<String>
 
     @POST("generate_aadhaar_otp")
-    suspend fun generateAadhaarOtp(@Body aadhaarModel: AadhaarModel):Response<JSONObject>
+    suspend fun generateAadhaarOtp(@Body aadhaarModel: AadhaarOtpRequestModel):Response<JSONObject>
 
     @POST("/verify_aadhaar_otp")
     suspend fun verifyAadhaarOtp()

@@ -8,6 +8,9 @@ import retrofit2.Response
 class NetworkUtil {
     companion object {
         const val BASE_URL = "https://staging.commcarehq.org/abdm/api/"
+        const val TRANSLATION_BASE_URL = "https://raw.githubusercontent.com/"
+        fun getTranslationEndpoint(code:String)=
+            "https://raw.githubusercontent.com/dimagi/abdm-app/main/resources/languages/${code}/language.json"
     }
 }
 

@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data class="EnterAadhaarBinding">
+        <import type="org.commcare.dalvik.domain.model.TranslationKey"/>
         <variable
             name="model"
             type="org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel" />
@@ -88,7 +89,7 @@
             android:layout_marginTop="32dp"
             android:enabled="false"
             android:onClickListener="@{clickHandler}"
-            android:text="@string/gen_otp"
+            app:translatedTextKey="@{TranslationKey.GEN_OTP}"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toBottomOf="@+id/aadharNumberInputLayout" />

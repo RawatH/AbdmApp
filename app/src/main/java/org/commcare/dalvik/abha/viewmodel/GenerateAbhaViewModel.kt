@@ -7,21 +7,30 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.PropMutableLiveData
+import org.commcare.dalvik.data.services.HqServices
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.HqResponseModel
+import org.commcare.dalvik.domain.model.LanguageManager
+import org.commcare.dalvik.domain.usecases.GetTranslationUseCase
 import org.commcare.dalvik.domain.usecases.RequestAadhaarOtpUsecase
 import org.commcare.dalvik.domain.usecases.RequestMobileOtpUseCase
 import org.commcare.dalvik.domain.usecases.SaveDataUsecase
+import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class GenerateAbhaViewModel @Inject constructor(
     val reqAadhaarOtpUsecase: RequestAadhaarOtpUsecase,
     val reqMobileOtpUseCase: RequestMobileOtpUseCase,
-    val saveDataUsecase: SaveDataUsecase
+    val saveDataUsecase: SaveDataUsecase,
+    val translationUseCase: GetTranslationUseCase
 ) : BaseViewModel() {
 
     private val TAG = "GenerateAbhaViewModel"
@@ -240,6 +249,18 @@ class GenerateAbhaViewModel @Inject constructor(
     fun clearBlockState() {
         saveDataUsecase.removeKey(PrefKeys.OTP_BLOCKED_TS.getKey())
     }
+
+    /**
+     * Fetch Translations
+     */
+    fun getTranslation(langCode: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            translationUseCase.execute(langCode)?.let{
+                LanguageManager.translationModel = it
+                uiState.emit(GenerateAbhaUiState.TranslationReceived)
+            } ?: Timber.d("XXXXX ")
+        }
+    }
 }
 
 /**
@@ -247,6 +268,7 @@ class GenerateAbhaViewModel @Inject constructor(
  */
 sealed class GenerateAbhaUiState {
     data class Loading(val isLoading: Boolean) : GenerateAbhaUiState()
+    object TranslationReceived : GenerateAbhaUiState()
     object ValidState : GenerateAbhaUiState()
     object InvalidState : GenerateAbhaUiState()
     object MobileAadhaarOtpGenerated : GenerateAbhaUiState()

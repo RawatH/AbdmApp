@@ -35,6 +35,7 @@ class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadha
                 binding.verifyOtp.isEnabled = it > AppConstants.AADHAAR_OTP_LENGTH
             }
         }
+        binding.verifyOtp.isEnabled = true
     }
 
     fun observeUiState() {

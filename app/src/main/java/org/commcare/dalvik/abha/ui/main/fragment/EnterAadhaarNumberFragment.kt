@@ -9,13 +9,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.EnterAadhaarBinding
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.checkMobileFirstNumber
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.domain.model.LanguageManager
 
 @AndroidEntryPoint
 class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaarBinding::inflate) {
@@ -76,6 +79,9 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                             binding.generateOtp.isEnabled = true
                         }
 
+                        is GenerateAbhaUiState.TranslationReceived ->{
+                           LanguageManager.translationModel
+                        }
                         is GenerateAbhaUiState.Error -> {
                             Log.d(TAG, "XXXXXXXX" + it.errorMsg)
                             binding.generateOtp.isEnabled = true
@@ -92,8 +98,8 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        viewModel.requestOtp()
-//        navigateToVerificationScreen()
+//        viewModel.requestOtp()
+        navigateToVerificationScreen()
 //        DialogUtility.showDialog(requireContext(),"TEST",DialogType.Blocking)
     }
 
