@@ -65,15 +65,13 @@ class VerifyAadhaarOtpFragment :
                         is GenerateAbhaUiState.Success -> {
                             when (it.requestType) {
                                 RequestType.AADHAAR_OTP -> {
-                                    val otpRequestModel =
+                                    val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
-                                    
+                                    viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
+
                                 }
                                 RequestType.AADHAAR_OTP_VERIFY -> {
-                                    val otpModel =
-                                        Gson().fromJson(it.data, OtpResponseModel::class.java)
-                                    val bundle = bundleOf("txnId" to otpModel.txnId)
-                                    navigateToNextScreen(RequestType.AADHAAR_OTP_VERIFY, bundle)
+                                    navigateToNextScreen()
                                 }
                             }
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
@@ -152,28 +150,18 @@ class VerifyAadhaarOtpFragment :
             }
 
             R.id.verifyOtp -> {
-                arguments?.getString("txnId")?.let {
-                    val otpRequestModel =
-                        VerifyOtpRequestModel(it, binding.aadhaarOtpEt.text.toString())
-                    viewModel.verifyAadhaarOtp(otpRequestModel)
+                viewModel.abhaRequestModel.value?.txnId?.let {
+                    val verifyOtpRequestModel = VerifyOtpRequestModel(it, binding.aadhaarOtpEt.text.toString())
+                    viewModel.verifyAadhaarOtp(verifyOtpRequestModel)
                 }
-
             }
 
         }
     }
 
-
-    private fun navigateToNextScreen(incomingReqType: RequestType, bundle: Bundle = bundleOf()) {
-        when (incomingReqType) {
-            RequestType.AADHAAR_OTP_VERIFY -> {
-                findNavController().navigate(
-                    R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment,
-                    bundle
-                )
-            }
-
-        }
-
+    private fun navigateToNextScreen(){
+        findNavController().navigate(
+            R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment)
     }
+
 }

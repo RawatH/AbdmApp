@@ -7,6 +7,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,10 @@ import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
+import org.commcare.dalvik.data.model.request.MobileOtpRequestModel
+import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
+import org.commcare.dalvik.domain.model.AbhaDetailModel
 
 @AndroidEntryPoint
 class VerifyMobileOtpFragment :
@@ -37,13 +41,11 @@ class VerifyMobileOtpFragment :
 
         lifecycleScope.launch(Dispatchers.Main) {
             binding.mobileOtpEt.observeText().collect {
-                binding.verifyOtp.isEnabled = it > AppConstants.MOBILE_OTP_LENGTH
+                binding.verifyOtp.isEnabled = it == AppConstants.MOBILE_OTP_LENGTH
             }
         }
 
-        arguments?.getString("txnId")?.let{
-            viewModel.requestMobileOtp(it)
-        }
+        viewModel.requestMobileOtp()
 
     }
 
@@ -52,7 +54,6 @@ class VerifyMobileOtpFragment :
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     when (it) {
-
 
 
                         GenerateAbhaUiState.InvalidState -> {
@@ -67,6 +68,9 @@ class VerifyMobileOtpFragment :
 
                                 }
                                 RequestType.MOBILE_OTP_VERIFY -> {
+                                    val abhaDetailModel =
+                                        Gson().fromJson(it.data, AbhaDetailModel::class.java)
+                                    viewModel.abhaDetailModel.value = abhaDetailModel
                                     navigateToNextScreen()
                                 }
                             }
@@ -91,7 +95,7 @@ class VerifyMobileOtpFragment :
         }
     }
 
-    fun observeOtpTimer() {
+    private fun observeOtpTimer() {
         lifecycleScope.launch(Dispatchers.Main) {
             binding.timeProgress.timestate.collect {
                 when (it) {
@@ -121,18 +125,20 @@ class VerifyMobileOtpFragment :
             }
 
             R.id.verifyOtp -> {
-                navigateToNextScreen()
+                val verifyMobileOtpRequestModel = VerifyOtpRequestModel(
+                    viewModel.abhaRequestModel.value!!.txnId,
+                    binding.mobileOtpEt.text.toString()
+                )
+                viewModel.verifyMobileOtp(verifyMobileOtpRequestModel)
             }
 
         }
     }
 
     private fun navigateToNextScreen() {
-        val mode = arguments?.getString("mode")
-        if (mode == null) {
-            findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaDetailFragment)
-        } else {
+        arguments?.getString("mode")?.let {
             findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaVerificationResultFragment)
-        }
+        } ?: findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaDetailFragment)
+
     }
 }

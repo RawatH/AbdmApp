@@ -7,24 +7,31 @@ import org.commcare.dalvik.abha.BR
 
 data class AbhaNumberRequestModel(val mobileNumber: String) : BaseObservable() {
 
+    var txnId: String = ""
+        @Bindable get
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.txnId)
+        }
+
     var aadhaar: String = ""
-    @Bindable get
-    set(value){
-        field = value
-        notifyPropertyChanged(BR.aadhaar)
-    }
+        @Bindable get
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.aadhaar)
+        }
 
 
     var isMobileOtpVerified: Boolean = false
         @Bindable get
-        set(value){
+        set(value) {
             field = value
             notifyPropertyChanged(BR.mobileOtpVerified)
         }
 
     var isAadharOtpVerified: Boolean = false
         @Bindable get
-        set(value){
+        set(value) {
             field = value
             notifyPropertyChanged(BR.aadharOtpVerified)
         }

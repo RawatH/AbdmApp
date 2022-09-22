@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okio.GzipSource
@@ -41,6 +42,7 @@ object AppModule {
     fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
+            .connectionPool(ConnectionPool(5,50,TimeUnit.SECONDS))
             .addInterceptor{chain ->
                 if(chain.request().url.host.contains("raw.githubusercontent.com")){
                     val request = chain.request().newBuilder()

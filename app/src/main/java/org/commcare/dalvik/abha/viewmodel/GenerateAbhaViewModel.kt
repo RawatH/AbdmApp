@@ -1,6 +1,5 @@
 package org.commcare.dalvik.abha.viewmodel
 
-import android.util.Log
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -17,6 +16,7 @@ import org.commcare.dalvik.abha.utility.PropMutableLiveData
 import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.AbdmErrorModel
+import org.commcare.dalvik.domain.model.AbhaDetailModel
 import org.commcare.dalvik.domain.model.HqResponseModel
 import org.commcare.dalvik.domain.model.LanguageManager
 import org.commcare.dalvik.domain.usecases.*
@@ -29,13 +29,14 @@ class GenerateAbhaViewModel @Inject constructor(
     private val reqMobileOtpUseCase: RequestMobileOtpUseCase,
     val saveDataUsecase: SaveDataUsecase,
     private val translationUseCase: GetTranslationUseCase,
-    private val verifyAadhaarOtpUseCase: VerifyAadhaarOtpUseCase
+    private val verifyAadhaarOtpUseCase: VerifyAadhaarOtpUseCase,
+    private val verifyMobileOtpUseCase: VerifyMobileOtpUseCase
 ) : BaseViewModel() {
 
-    private val TAG = "GenerateAbhaViewModel"
 
     var otpFailureCount = MutableLiveData(0)
     var abhaRequestModel: PropMutableLiveData<AbhaNumberRequestModel> = PropMutableLiveData()
+    val abhaDetailModel:MutableLiveData<AbhaDetailModel> = MutableLiveData()
 
     val uiState = MutableStateFlow<GenerateAbhaUiState>(GenerateAbhaUiState.InvalidState)
 
@@ -124,9 +125,9 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Re Mobile Otp
      */
-    fun requestMobileOtp(txnId:String) {
+    fun requestMobileOtp() {
         viewModelScope.launch {
-            reqMobileOtpUseCase.execute(abhaRequestModel.value!!.mobileNumber,txnId).collect {
+            reqMobileOtpUseCase.execute(abhaRequestModel.value!!.mobileNumber,abhaRequestModel.value!!.txnId).collect {
                 when (it) {
                     is HqResponseModel.Success -> {
                         uiState.emit(
@@ -158,7 +159,7 @@ class GenerateAbhaViewModel @Inject constructor(
     fun getData(key: Preferences.Key<String>) {
         viewModelScope.launch {
             saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey()).collect {
-                Log.d(TAG, "OTP TS : ${it}")
+               Timber.d("OTP TS : ${it}")
             }
         }
     }
@@ -220,8 +221,37 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Verify Mobile OTP
      */
-    fun verifyMobileOtp(txnId: String) {
+    fun verifyMobileOtp(verifyMobileOtpRequestModel: VerifyOtpRequestModel) {
+        viewModelScope.launch(Dispatchers.Main) {
+            verifyMobileOtpUseCase.execute(verifyMobileOtpRequestModel).collect {
+                when (it) {
+                    HqResponseModel.Loading -> {
+                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                    }
 
+                    is HqResponseModel.Success -> {
+                        uiState.emit(
+                            GenerateAbhaUiState.Success(
+                                it.value,
+                                RequestType.MOBILE_OTP_VERIFY
+                            )
+                        )
+
+                    }
+                    is HqResponseModel.Error -> {
+                        uiState.emit(GenerateAbhaUiState.Loading(false))
+
+                    }
+                    is HqResponseModel.AbdmError -> {
+                        GenerateAbhaUiState.AbdmError(
+                            it.value,
+                            RequestType.MOBILE_OTP_VERIFY
+                        )
+                    }
+
+                }
+            }
+        }
     }
 
     /**
