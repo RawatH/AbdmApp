@@ -2,24 +2,31 @@ package org.commcare.dalvik.abha.ui.main.fragment
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyAadhaarOtpBinding
 import org.commcare.dalvik.abha.ui.main.custom.ProgressState
 import org.commcare.dalvik.abha.utility.AppConstants
+import org.commcare.dalvik.abha.utility.DialogType
+import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
+import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
+import org.commcare.dalvik.domain.model.OtpResponseModel
 
-class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadhaarOtpBinding::inflate) {
+class VerifyAadhaarOtpFragment :
+    BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadhaarOtpBinding::inflate) {
 
     private val viewModel: GenerateAbhaViewModel by activityViewModels()
 
@@ -28,14 +35,17 @@ class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadha
         binding.model = viewModel
         binding.clickHandler = this
         observeOtpTimer()
+        viewModel.resetUiState()
         observeUiState()
 
         lifecycleScope.launch(Dispatchers.Main) {
             binding.aadhaarOtpEt.observeText().collect {
-                binding.verifyOtp.isEnabled = it > AppConstants.AADHAAR_OTP_LENGTH
+                binding.verifyOtp.isEnabled = it == AppConstants.AADHAAR_OTP_LENGTH
             }
         }
         binding.verifyOtp.isEnabled = true
+
+        viewModel.requestAadhaarOtp()
     }
 
     fun observeUiState() {
@@ -54,11 +64,16 @@ class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadha
 
                         is GenerateAbhaUiState.Success -> {
                             when (it.requestType) {
-                                RequestType.AADHAAR_OTP_RESEND -> {
-
+                                RequestType.AADHAAR_OTP -> {
+                                    val otpRequestModel =
+                                        Gson().fromJson(it.data, OtpResponseModel::class.java)
+                                    
                                 }
                                 RequestType.AADHAAR_OTP_VERIFY -> {
-                                    navigateToNextScreen()
+                                    val otpModel =
+                                        Gson().fromJson(it.data, OtpResponseModel::class.java)
+                                    val bundle = bundleOf("txnId" to otpModel.txnId)
+                                    navigateToNextScreen(RequestType.AADHAAR_OTP_VERIFY, bundle)
                                 }
                             }
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
@@ -66,15 +81,36 @@ class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadha
 
                         is GenerateAbhaUiState.Error -> {
                             when (it.requestType) {
-                                RequestType.AADHAAR_OTP_RESEND -> {
+                                RequestType.AADHAAR_OTP -> {
                                     binding.verifyOtp.isEnabled =
                                         binding.aadhaarOtpEt.text?.isNotEmpty() ?: false
                                     binding.timeProgress.startTimer()
                                 }
                                 RequestType.AADHAAR_OTP_VERIFY -> {
-                                    navigateToNextScreen()
+                                    binding.verifyOtp.text = ""
+
                                 }
                             }
+                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
+                        }
+
+                        is GenerateAbhaUiState.AbdmError -> {
+                            when (it.requestType) {
+                                RequestType.AADHAAR_OTP -> {
+                                    binding.verifyOtp.isEnabled =
+                                        binding.aadhaarOtpEt.text?.isNotEmpty() ?: false
+                                    binding.timeProgress.startTimer()
+                                }
+                                RequestType.AADHAAR_OTP_VERIFY -> {
+                                    binding.verifyOtp.text = ""
+
+                                }
+                            }
+                            DialogUtility.showDialog(
+                                requireContext(),
+                                it.data.getActualMessage(),
+                                type = DialogType.Blocking
+                            )
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
                     }
@@ -116,13 +152,28 @@ class VerifyAadhaarOtpFragment:BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadha
             }
 
             R.id.verifyOtp -> {
-                navigateToNextScreen()
+                arguments?.getString("txnId")?.let {
+                    val otpRequestModel =
+                        VerifyOtpRequestModel(it, binding.aadhaarOtpEt.text.toString())
+                    viewModel.verifyAadhaarOtp(otpRequestModel)
+                }
+
             }
 
         }
     }
 
-    private fun navigateToNextScreen(){
-        findNavController().navigate(R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment)
+
+    private fun navigateToNextScreen(incomingReqType: RequestType, bundle: Bundle = bundleOf()) {
+        when (incomingReqType) {
+            RequestType.AADHAAR_OTP_VERIFY -> {
+                findNavController().navigate(
+                    R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment,
+                    bundle
+                )
+            }
+
+        }
+
     }
 }

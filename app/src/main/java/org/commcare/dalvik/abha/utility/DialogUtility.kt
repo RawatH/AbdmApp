@@ -11,7 +11,7 @@ object DialogUtility {
 
     fun getTheme(type: DialogType) = when (type) {
         DialogType.Blocking -> {
-            R.style.DialogThemeBlocker
+            R.style.DialogThemeWarning
         }
         DialogType.Warning -> {
             R.style.DialogThemeWarning
@@ -39,7 +39,7 @@ object DialogUtility {
 
 
     fun showDialog(context: Context, msg: String, type: DialogType = DialogType.General) {
-        getDialogBuilder(context, msg)
+        getDialogBuilder(context, msg ,type)
             .setPositiveButton(context.resources.getString(R.string.ok)) { dialog, which ->
                 dialog.dismiss()
             }

@@ -24,6 +24,8 @@ object LanguageManager {
             "\t\t\"ABHA_NUM\": \"ABHA Number\",\n" +
             "\t\t\"RETURN\": \"Return\",\n" +
             "\t\t\"STATUS\": \"Status\",\n" +
+            "\t\t\"ABHA_VERIFICATION\": \"ABHA Verification\",\n" +
+            "\t\t\"ABHA_CREATION\": \"ABHA Creation\",\n" +
             "\t\t\"VERIFICATION_STATUS\": \"Verification Status\",\n" +
             "\t\t\"SEL_AUTH_METHOD\": \"Select auth method\",\n" +
             "\t\t\"USE_ADHR_DATA_IN_COMMCARE\": \"Use Aadhaar data in Commcare\"\n" +
@@ -57,7 +59,9 @@ enum class TranslationKey {
     RETURN,
     ABHA_NUM,
     ADHR_DATA,
-    USE_ADHR_DATA_IN_COMMCARE
+    USE_ADHR_DATA_IN_COMMCARE,
+    ABHA_VERIFICATION,
+    ABHA_CREATION
 }
 
 

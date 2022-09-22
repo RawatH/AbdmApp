@@ -47,7 +47,7 @@ class TestActivity : AppCompatActivity() {
         val intent = Intent(this, AbdmActivity::class.java).apply {
             putExtras(
                 bundleOf(
-                    "mobile_num" to "7560833229",
+                    "mobile_num" to "9560833229",
                     "abdm_api_key" to "1122333"
                 )
             )

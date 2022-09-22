@@ -50,9 +50,10 @@ object AppModule {
                     response
                 }else {
                     val request = chain.request().newBuilder()
+                        .addHeader("content-type","application/json")
                         .addHeader(
                             "Authorization",
-                            "Token 01bed27f81885164999b2adc0e28b8ba8cb58eda"
+                            "109b062f806baf3b750eaec84bebd5978de095e1"//"Token 01bed27f81885164999b2adc0e28b8ba8cb58eda"
                         )
                         .build()
                     chain.proceed(request)

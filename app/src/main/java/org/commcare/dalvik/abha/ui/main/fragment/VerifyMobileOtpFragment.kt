@@ -40,6 +40,11 @@ class VerifyMobileOtpFragment :
                 binding.verifyOtp.isEnabled = it > AppConstants.MOBILE_OTP_LENGTH
             }
         }
+
+        arguments?.getString("txnId")?.let{
+            viewModel.requestMobileOtp(it)
+        }
+
     }
 
     fun observeUiState() {

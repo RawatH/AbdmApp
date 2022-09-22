@@ -48,7 +48,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         observeLoader()
         observeOtpFailure()
         checkForBlockScenario()
-        viewmodel.getTranslation("hi")
+        viewmodel.getTranslation("hin")
     }
 
     private fun checkForBlockScenario() {
