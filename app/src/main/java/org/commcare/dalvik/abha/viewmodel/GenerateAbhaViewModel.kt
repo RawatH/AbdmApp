@@ -36,7 +36,6 @@ class GenerateAbhaViewModel @Inject constructor(
     private val verifyMobileOtpUseCase: VerifyMobileOtpUseCase
 ) : BaseViewModel() {
 
-
     var selectedAuthMethod:String? = null
     var otpFailureCount = MutableLiveData(0)
     var abhaRequestModel: PropMutableLiveData<AbhaNumberRequestModel> = PropMutableLiveData()
@@ -153,7 +152,6 @@ class GenerateAbhaViewModel @Inject constructor(
                             )
                         )
                     }
-
 
                     is HqResponseModel.Loading -> {
                         uiState.emit(GenerateAbhaUiState.Loading(true))
@@ -378,22 +376,10 @@ class GenerateAbhaViewModel @Inject constructor(
                     }
 
                     is HqResponseModel.Success -> {
-                        if (it.value.has("auth_methods")) {
-                            uiState.emit(
-                                GenerateAbhaUiState.Success(
-                                    it.value,
-                                    RequestType.AUTH_METHODS
-                                )
-                            )
-                        } else {
-                            uiState.emit(
-                                GenerateAbhaUiState.Error(
-                                    JsonObject(),
-                                    RequestType.AUTH_METHODS
-                                )
-                            )
-                        }
-
+                        GenerateAbhaUiState.Success(
+                            it.value,
+                            RequestType.GENERATE_AUTH_OTP
+                        )
                     }
                     is HqResponseModel.Error -> {
 
