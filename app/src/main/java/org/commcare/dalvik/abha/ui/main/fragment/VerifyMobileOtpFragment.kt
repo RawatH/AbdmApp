@@ -15,13 +15,11 @@ import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
 import org.commcare.dalvik.abha.ui.main.custom.ProgressState
 import org.commcare.dalvik.abha.utility.AppConstants
-import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
-import org.commcare.dalvik.data.model.request.MobileOtpRequestModel
-import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
+import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.AbhaDetailModel
 
@@ -112,9 +110,6 @@ class VerifyMobileOtpFragment :
         }
     }
 
-    override fun onFragmentReady() {
-
-    }
 
     override fun onClick(view: View?) {
         super.onClick(view)

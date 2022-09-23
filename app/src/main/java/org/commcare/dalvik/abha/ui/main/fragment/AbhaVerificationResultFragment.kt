@@ -13,9 +13,6 @@ class AbhaVerificationResultFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.clickHandler = this
     }
-    override fun onFragmentReady() {
-
-    }
 
     override fun onClick(view: View?) {
         super.onClick(view)

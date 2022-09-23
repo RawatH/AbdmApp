@@ -21,9 +21,6 @@ class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBin
         renderAadhaarData()
     }
 
-    override fun onFragmentReady() {
-
-    }
 
     private fun renderAadhaarData(){
         viewModel.abhaDetailModel.value?.getAadhaarDataList()?.forEachIndexed { index,kvModel ->

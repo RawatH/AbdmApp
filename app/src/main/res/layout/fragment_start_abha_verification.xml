@@ -30,6 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/EditTextStyle"
+                android:enabled="false"
                 app:translatedTextKey="@{TranslationKey.BENF_ABHA_NUM}"
                 android:maxLength="10"
                 android:inputType="number"

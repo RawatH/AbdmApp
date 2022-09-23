@@ -1,9 +1,10 @@
 package org.commcare.dalvik.data.services
 
 import com.google.gson.JsonObject
-import org.commcare.dalvik.data.model.request.AadhaarOtpRequestModel
-import org.commcare.dalvik.data.model.request.MobileOtpRequestModel
-import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
+import org.commcare.dalvik.domain.model.AadhaarOtpRequestModel
+import org.commcare.dalvik.domain.model.GenerateAuthOtpModel
+import org.commcare.dalvik.domain.model.MobileOtpRequestModel
+import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -21,7 +22,10 @@ interface HqServices {
     @POST("verify_mobile_otp")
     suspend fun verifyMobileOtp(@Body verifyOtpRequestModel: VerifyOtpRequestModel):Response<JsonObject>
 
+    @POST("generate_auth_otp")
+    suspend fun generateAuthOtp(@Body generateAuthOtpModel: GenerateAuthOtpModel):Response<JsonObject>
+
     @GET("get_auth_methods")
-    suspend fun getAuthenticationMethods()
+    suspend fun getAuthenticationMethods(@Query("health_id") healthId:String):Response<JsonObject>
 
 }

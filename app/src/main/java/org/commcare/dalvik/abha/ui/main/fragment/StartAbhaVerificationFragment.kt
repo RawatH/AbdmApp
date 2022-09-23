@@ -19,9 +19,6 @@ class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>
 
     private val viewModel: GenerateAbhaViewModel by activityViewModels()
 
-    override fun onFragmentReady() {
-
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -30,7 +27,7 @@ class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>
         attachUiStateObserver()
     }
 
-    fun populateIntentData() {
+    private fun populateIntentData() {
         arguments?.getString("abha_id")?.apply {
             binding.abhaNumberEt.setText(this)
         }
@@ -39,10 +36,10 @@ class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        findNavController().navigate(R.id.action_startAbhaVerificationFragment_to_selectAuthenticationFragment)
+        findNavController().navigate(R.id.action_startAbhaVerificationFragment_to_selectAuthenticationFragment ,arguments)
     }
 
-    fun attachUiStateObserver() {
+    private fun attachUiStateObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {

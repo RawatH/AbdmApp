@@ -8,10 +8,14 @@ data class TranslationModel(
     val data: JsonObject
 ) {
 
-    fun getTranslatedString(key: String):String {
-        return data[key]?.let {
-            it.asString
-        } ?: key
+    fun getTranslatedString(key: String): String {
+        return if (data.has(key)) {
+            data[key]?.let {
+               return it.asString
+            } ?:key
+        } else {
+           return LanguageManager.getDefaultTranslation(key)
+        }
     }
 
 }

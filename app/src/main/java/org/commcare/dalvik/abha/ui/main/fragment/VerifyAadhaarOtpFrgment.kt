@@ -2,7 +2,6 @@ package org.commcare.dalvik.abha.ui.main.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,7 +20,7 @@ import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
-import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
+import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.OtpResponseModel
 
@@ -43,12 +42,11 @@ class VerifyAadhaarOtpFragment :
                 binding.verifyOtp.isEnabled = it == AppConstants.AADHAAR_OTP_LENGTH
             }
         }
-        binding.verifyOtp.isEnabled = true
 
         viewModel.requestAadhaarOtp()
     }
 
-    fun observeUiState() {
+    private fun observeUiState() {
         lifecycleScope.launch(Dispatchers.Main) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
@@ -117,7 +115,7 @@ class VerifyAadhaarOtpFragment :
         }
     }
 
-    fun observeOtpTimer() {
+    private fun observeOtpTimer() {
         lifecycleScope.launch(Dispatchers.Main) {
             binding.timeProgress.timestate.collect {
                 when (it) {
@@ -133,19 +131,14 @@ class VerifyAadhaarOtpFragment :
         }
     }
 
-    override fun onFragmentReady() {
-
-    }
 
     override fun onClick(view: View?) {
         super.onClick(view)
-
-
-        super.onClick(view)
         when (view?.id) {
             R.id.resentOtp -> {
+                binding.aadhaarOtpEt.setText("")
                 binding.resentOtp.isEnabled = false
-                binding.verifyOtp.isEnabled = false
+//                binding.verifyOtp.isEnabled = false
                 viewModel.resendAadhaarOtpRequest()
             }
 

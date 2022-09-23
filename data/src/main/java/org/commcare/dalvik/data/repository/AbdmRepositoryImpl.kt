@@ -1,22 +1,14 @@
 package org.commcare.dalvik.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import org.commcare.dalvik.data.model.request.AadhaarOtpRequestModel
-import org.commcare.dalvik.data.model.request.MobileOtpRequestModel
-import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
 import org.commcare.dalvik.data.network.safeApiCall
 import org.commcare.dalvik.data.services.HqServices
-import org.commcare.dalvik.domain.model.HqResponseModel
+import org.commcare.dalvik.domain.model.*
 import org.commcare.dalvik.domain.repositories.AbdmRepository
 import javax.inject.Inject
 
 class AbdmRepositoryImpl @Inject constructor(val hqServices: HqServices) : AbdmRepository {
 
-    private val TAG = "AbdmRepositoryImpl"
-
-    override suspend fun generateAbhaNumber() {
-
-    }
 
     override fun generateMobileOtp(mobileModel: MobileOtpRequestModel): Flow<HqResponseModel> =
         safeApiCall {
@@ -29,9 +21,16 @@ class AbdmRepositoryImpl @Inject constructor(val hqServices: HqServices) : AbdmR
             hqServices.generateAadhaarOtp(aadhaarModel)
         }
 
+    override fun getAuthenticationMethods(healthId:String): Flow<HqResponseModel>  =
+        safeApiCall {
+            hqServices.getAuthenticationMethods(healthId)
+        }
 
-    override suspend fun verifyAbhaNumber() {
-    }
+    override fun generateAuthOtp(generateAuthOtp: GenerateAuthOtpModel): Flow<HqResponseModel> =
+        safeApiCall {
+            hqServices.generateAuthOtp(generateAuthOtp)
+        }
+
 
     override fun verifyMobileOtp(verifyOtpRequestModel: VerifyOtpRequestModel): Flow<HqResponseModel> =
         safeApiCall {
@@ -42,12 +41,5 @@ class AbdmRepositoryImpl @Inject constructor(val hqServices: HqServices) : AbdmR
         safeApiCall {
             hqServices.verifyAadhaarOtp(verifyOtpRequestModel)
         }
-
-
-//    override  fun getTranslationData(langCode:String) =
-//        safeApiCall {
-//            hqServices.getTranslationData(NetworkUtil.getTranslationEndpoint(langCode))
-//        }
-
 
 }

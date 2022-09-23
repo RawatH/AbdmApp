@@ -57,8 +57,8 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical|start"
                     android:text="@{model.key}"
-                    android:paddingStart="5dp"
-                    android:paddingLeft="5dp"
+                    android:paddingStart="2dp"
+                    android:paddingLeft="2dp"
                     style="@style/Headline2"/>
 
                 <TextView
@@ -66,8 +66,8 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical|end"
                     style="@style/Headline2"
-                    android:paddingEnd="5dp"
-                    android:paddingRight="5dp"
+                    android:paddingEnd="2dp"
+                    android:paddingRight="2dp"
                     android:text="@{model.value}" />
 
             </TableRow>

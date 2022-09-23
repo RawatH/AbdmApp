@@ -40,7 +40,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         populateIntentData()
     }
 
-    fun populateIntentData() {
+    private fun populateIntentData() {
         arguments?.getString("mobile_num")?.apply {
             viewModel.init(this)
             observeRequestModel()
@@ -61,9 +61,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         }
     }
 
-    override fun onFragmentReady() {
 
-    }
 
     private fun attachUiStateObserver() {
         viewLifecycleOwner.lifecycleScope.launch {

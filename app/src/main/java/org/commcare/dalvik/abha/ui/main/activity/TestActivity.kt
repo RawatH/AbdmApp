@@ -34,7 +34,8 @@ class TestActivity : AppCompatActivity() {
         val intent = Intent(this, AbdmActivity::class.java).apply {
             putExtras(
                 bundleOf(
-                    "abha_id" to "9560833229"
+                    "abha_id" to "91766261606756",
+                    "lang_code" to "hin"
                 )
             )
         }
@@ -47,8 +48,9 @@ class TestActivity : AppCompatActivity() {
         val intent = Intent(this, AbdmActivity::class.java).apply {
             putExtras(
                 bundleOf(
-                    "mobile_num" to "9560833229",
-                    "abdm_api_key" to "1122333"
+                    "mobile_number" to "9560833229",
+                    "abdm_api_token" to "1122333",
+                    "lang_code" to "hin"
                 )
             )
         }

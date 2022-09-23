@@ -9,11 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.PropMutableLiveData
-import org.commcare.dalvik.data.model.request.VerifyOtpRequestModel
+import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.AbdmErrorModel
 import org.commcare.dalvik.domain.model.AbhaDetailModel
@@ -25,6 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GenerateAbhaViewModel @Inject constructor(
+    private val generateAuthOtpUsecase: GenerateAuthOtpUsecase,
+    private val authenticationMethodsUsecase: GetAuthenticationMethodsUsecase,
     private val reqAadhaarOtpUsecase: RequestAadhaarOtpUsecase,
     private val reqMobileOtpUseCase: RequestMobileOtpUseCase,
     val saveDataUsecase: SaveDataUsecase,
@@ -34,9 +37,10 @@ class GenerateAbhaViewModel @Inject constructor(
 ) : BaseViewModel() {
 
 
+    var selectedAuthMethod:String? = null
     var otpFailureCount = MutableLiveData(0)
     var abhaRequestModel: PropMutableLiveData<AbhaNumberRequestModel> = PropMutableLiveData()
-    val abhaDetailModel:MutableLiveData<AbhaDetailModel> = MutableLiveData()
+    val abhaDetailModel: MutableLiveData<AbhaDetailModel> = MutableLiveData()
 
     val uiState = MutableStateFlow<GenerateAbhaUiState>(GenerateAbhaUiState.InvalidState)
 
@@ -127,7 +131,10 @@ class GenerateAbhaViewModel @Inject constructor(
      */
     fun requestMobileOtp() {
         viewModelScope.launch {
-            reqMobileOtpUseCase.execute(abhaRequestModel.value!!.mobileNumber,abhaRequestModel.value!!.txnId).collect {
+            reqMobileOtpUseCase.execute(
+                abhaRequestModel.value!!.mobileNumber,
+                abhaRequestModel.value!!.txnId
+            ).collect {
                 when (it) {
                     is HqResponseModel.Success -> {
                         uiState.emit(
@@ -156,10 +163,13 @@ class GenerateAbhaViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Get data from data store
+     */
     fun getData(key: Preferences.Key<String>) {
         viewModelScope.launch {
             saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey()).collect {
-               Timber.d("OTP TS : ${it}")
+                Timber.d("OTP TS : ${it}")
             }
         }
     }
@@ -295,6 +305,7 @@ class GenerateAbhaViewModel @Inject constructor(
      * Resend Aadhaar OTP request
      */
     fun resendAadhaarOtpRequest() {
+
         viewModelScope.launch(Dispatchers.Main) {
             uiState.emit(GenerateAbhaUiState.AadhaarOtpRequested)
 
@@ -354,6 +365,86 @@ class GenerateAbhaViewModel @Inject constructor(
             } ?: Timber.d("Unable to fetch translations ")
         }
     }
+
+    /**
+     * Generate Auth OTP
+     */
+    fun getAuthOtp(healthId: String, authMethod: String) {
+        viewModelScope.launch {
+            generateAuthOtpUsecase.execute(healthId, authMethod).collect {
+                when (it) {
+                    HqResponseModel.Loading -> {
+                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                    }
+
+                    is HqResponseModel.Success -> {
+                        if (it.value.has("auth_methods")) {
+                            uiState.emit(
+                                GenerateAbhaUiState.Success(
+                                    it.value,
+                                    RequestType.AUTH_METHODS
+                                )
+                            )
+                        } else {
+                            uiState.emit(
+                                GenerateAbhaUiState.Error(
+                                    JsonObject(),
+                                    RequestType.AUTH_METHODS
+                                )
+                            )
+                        }
+
+                    }
+                    is HqResponseModel.Error -> {
+
+                    }
+                    is HqResponseModel.AbdmError -> {
+
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch Authentication methods
+     */
+    fun getAuthenticationMethods(healthId: String) {
+        viewModelScope.launch {
+            authenticationMethodsUsecase.execute(healthId).collect {
+                when (it) {
+                    HqResponseModel.Loading -> {
+                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                    }
+
+                    is HqResponseModel.Success -> {
+                        if (it.value.has("auth_methods")) {
+                            uiState.emit(
+                                GenerateAbhaUiState.Success(
+                                    it.value,
+                                    RequestType.AUTH_METHODS
+                                )
+                            )
+                        } else {
+                            uiState.emit(
+                                GenerateAbhaUiState.Error(
+                                    JsonObject(),
+                                    RequestType.AUTH_METHODS
+                                )
+                            )
+                        }
+
+                    }
+                    is HqResponseModel.Error -> {
+
+                    }
+                    is HqResponseModel.AbdmError -> {
+
+                    }
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -370,7 +461,9 @@ sealed class GenerateAbhaUiState {
     object MobileOtpVerified : GenerateAbhaUiState()
     object AadhaarOtpVerified : GenerateAbhaUiState()
     object Blocked : GenerateAbhaUiState()
-    data class Success(val data: JsonObject, val requestType: RequestType) : GenerateAbhaUiState()
+    data class Success(val data: JsonObject, val requestType: RequestType) :
+        GenerateAbhaUiState()
+
     data class Error(val data: JsonObject, val requestType: RequestType) : GenerateAbhaUiState()
     data class AbdmError(val data: AbdmErrorModel, val requestType: RequestType) :
         GenerateAbhaUiState()
@@ -383,5 +476,7 @@ enum class RequestType {
     MOBILE_OTP_RESEND,
     MOBILE_OTP_VERIFY,
     AADHAAR_OTP,
-    AADHAAR_OTP_VERIFY
+    AADHAAR_OTP_VERIFY,
+    AUTH_METHODS,
+    GENERATE_AUTH_OTP
 }

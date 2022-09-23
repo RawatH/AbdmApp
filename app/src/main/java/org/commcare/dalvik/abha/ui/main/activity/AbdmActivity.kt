@@ -48,7 +48,11 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         observeLoader()
         observeOtpFailure()
         checkForBlockScenario()
-        viewmodel.getTranslation("hin")
+
+        intent.extras?.getString("lang_code")?.let{
+            viewmodel.getTranslation(it)
+        }
+
     }
 
     private fun checkForBlockScenario() {
@@ -76,7 +80,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     /**
      * OTP failure check
      */
-    fun observeOtpFailure() {
+    private fun observeOtpFailure() {
         lifecycleScope.launch {
             viewmodel.otpFailureCount.asFlow().collect { otpFailCount ->
                 if (otpFailCount == 4) {
@@ -92,7 +96,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
 
-    fun observeLoader() {
+    private fun observeLoader() {
         lifecycleScope.launch(Dispatchers.Main) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewmodel.uiState.collect {
@@ -115,11 +119,11 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
 
-    fun inflateNavGraph() {
+    private fun inflateNavGraph() {
         val bundle = intent.extras ?: bundleOf()
 
 
-        HeaderInterceptor.API_KEY = bundle.getString("abdm_api_key", "11")
+        HeaderInterceptor.API_KEY = bundle.getString("abdm_api_token", "11")
 
         intent.putExtras(bundle)
         val inflater = navController.navInflater

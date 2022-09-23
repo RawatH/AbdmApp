@@ -31,8 +31,6 @@ abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflate
         return binding.root
     }
 
-    abstract fun onFragmentReady()
-
     override fun onClick(view: View?) {
 
     }
