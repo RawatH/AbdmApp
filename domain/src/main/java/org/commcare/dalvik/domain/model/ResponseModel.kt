@@ -1,5 +1,7 @@
 package org.commcare.dalvik.domain.model
 
+import com.google.gson.JsonObject
+
 
 class AbdmErrorModel() {
     lateinit var code: String
@@ -17,7 +19,7 @@ class AbdmErrorModel() {
 class AbdmErrorDetail() {
     lateinit var message: String
     lateinit var code: String
-    var attribute: String? = null
+    var attribute: JsonObject? = null
 }
 
 data class OtpResponseModel(val txnId:String)

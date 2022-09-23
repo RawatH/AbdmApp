@@ -118,6 +118,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
     }
 
     private fun navigateToAadhaarOtpVerificationScreen() {
+        val bundle = bundleOf("genAadhaarOtp" to true)
         findNavController().navigate(R.id.action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment)
     }
 

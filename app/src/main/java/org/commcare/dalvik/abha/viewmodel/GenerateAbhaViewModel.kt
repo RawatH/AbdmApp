@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
+import org.commcare.dalvik.abha.model.AbhaVerificationRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
+import org.commcare.dalvik.abha.utility.DialogType
+import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.PropMutableLiveData
 import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
@@ -36,8 +39,9 @@ class GenerateAbhaViewModel @Inject constructor(
     private val verifyMobileOtpUseCase: VerifyMobileOtpUseCase
 ) : BaseViewModel() {
 
-    var selectedAuthMethod:String? = null
+    var selectedAuthMethod: String? = null
     var otpFailureCount = MutableLiveData(0)
+    var abhaVerificationRequestModel:MutableLiveData<AbhaVerificationRequestModel> = MutableLiveData()
     var abhaRequestModel: PropMutableLiveData<AbhaNumberRequestModel> = PropMutableLiveData()
     val abhaDetailModel: MutableLiveData<AbhaDetailModel> = MutableLiveData()
 
@@ -376,15 +380,23 @@ class GenerateAbhaViewModel @Inject constructor(
                     }
 
                     is HqResponseModel.Success -> {
-                        GenerateAbhaUiState.Success(
-                            it.value,
-                            RequestType.GENERATE_AUTH_OTP
+                        uiState.emit(
+                            GenerateAbhaUiState.Success(
+                                it.value,
+                                RequestType.GENERATE_AUTH_OTP
+                            )
                         )
                     }
                     is HqResponseModel.Error -> {
 
                     }
                     is HqResponseModel.AbdmError -> {
+                        uiState.emit(
+                            GenerateAbhaUiState.AbdmError(
+                                it.value,
+                                RequestType.GENERATE_AUTH_OTP
+                            )
+                        )
 
                     }
                 }

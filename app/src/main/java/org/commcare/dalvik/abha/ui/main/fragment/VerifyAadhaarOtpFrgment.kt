@@ -43,7 +43,10 @@ class VerifyAadhaarOtpFragment :
             }
         }
 
-        viewModel.requestAadhaarOtp()
+        arguments?.containsKey("genAadhaarOtp")?.let {
+            viewModel.requestAadhaarOtp()
+        }
+
     }
 
     private fun observeUiState() {

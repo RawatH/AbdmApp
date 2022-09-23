@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,9 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.SelectAuthMethodBinding
+import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
+import org.commcare.dalvik.abha.utility.DialogType
+import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
@@ -49,6 +53,7 @@ class SelectAuthenticationFragment :
                                 RequestType.GENERATE_AUTH_OTP -> {
                                     val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
+                                    viewModel.abhaRequestModel.setValue(AbhaNumberRequestModel(""))
                                     viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
                                     navigateToNextScreen()
                                 }
@@ -82,6 +87,11 @@ class SelectAuthenticationFragment :
                         }
 
                         is GenerateAbhaUiState.AbdmError -> {
+                            DialogUtility.showDialog(
+                                requireContext(),
+                                it.data.getActualMessage(),
+                                type = DialogType.Blocking
+                            )
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 
@@ -110,8 +120,17 @@ class SelectAuthenticationFragment :
     }
 
     private fun navigateToNextScreen() {
-        findNavController().navigate(
-            R.id.action_selectAuthenticationFragment_to_verifyMobileOtpFragment
-        )
+        viewModel.selectedAuthMethod?.let {
+            if (it.equals("AADHAAR_OTP")) {
+                findNavController().navigate(
+                    R.id.action_selectAuthenticationFragment_to_verifyAadhaarOtpFragment
+                )
+            } else {
+                findNavController().navigate(
+                    R.id.action_selectAuthenticationFragment_to_verifyMobileOtpFragment
+                )
+            }
+        }
+
     }
 }
