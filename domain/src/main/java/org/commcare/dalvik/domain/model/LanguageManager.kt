@@ -37,6 +37,9 @@ object LanguageManager {
 
     fun getTranslatedValue(key: TranslationKey) = translationModel.getTranslatedString(key.name)
 
+    fun getTranslatedValue(key: String) = translationModel.getTranslatedString(key)
+
+
     fun init() {
         translationModel =
             Gson().fromJson(DEFAULT_TRANSLATIONS, TranslationModel::class.java)

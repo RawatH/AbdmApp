@@ -70,6 +70,7 @@ class VerifyMobileOtpFragment :
                                 RequestType.MOBILE_OTP_VERIFY -> {
                                     val abhaDetailModel =
                                         Gson().fromJson(it.data, AbhaDetailModel::class.java)
+                                    abhaDetailModel.data = it.data
                                     viewModel.abhaDetailModel.value = abhaDetailModel
                                     navigateToNextScreen()
                                 }

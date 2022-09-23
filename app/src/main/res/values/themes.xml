@@ -19,27 +19,31 @@
     </style>
 
 
-    <style name="Headline1" parent="TextViewStyle">
+    <style name="HeadlineBase" parent="TextViewStyle">
+
+    </style>
+
+    <style name="Headline1" parent="HeadlineBase">
         <item name="android:fontFamily">@font/nunitosans_extrabold</item>
     </style>
 
-    <style name="Headline2" parent="TextViewStyle">
+    <style name="Headline2" parent="HeadlineBase">
         <item name="android:fontFamily">@font/nunitosans_bold</item>
     </style>
 
-    <style name="Headline3" parent="TextViewStyle">
+    <style name="Headline3" parent="HeadlineBase">
         <item name="android:fontFamily">@font/nunitosans_semibold</item>
     </style>
 
-    <style name="Headline4" parent="TextViewStyle">
+    <style name="Headline4" parent="HeadlineBase">
         <item name="android:fontFamily">@font/nunitosans_extrabold</item>
     </style>
 
-    <style name="Headline5" parent="TextViewStyle">
+    <style name="Headline5" parent="HeadlineBase">
         <item name="android:fontFamily">@font/nunitosans_extrabold</item>
     </style>
 
-    <style name="Headline6" parent="TextViewStyle">
+    <style name="Headline6" parent="HeadlineBase">
         <item name="android:fontFamily">@font/nunitosans_extrabold</item>
     </style>
 
