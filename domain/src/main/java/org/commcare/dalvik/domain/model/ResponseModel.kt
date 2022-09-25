@@ -1,6 +1,7 @@
 package org.commcare.dalvik.domain.model
 
 import com.google.gson.JsonObject
+import java.io.Serializable
 
 
 class AbdmErrorModel() {
@@ -23,3 +24,5 @@ class AbdmErrorDetail() {
 }
 
 data class OtpResponseModel(val txnId:String)
+
+data class AbhaVerificationResultModel(val status:String , val healthId:String = ""):Serializable

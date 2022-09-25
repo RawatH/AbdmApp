@@ -41,7 +41,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
     }
 
     private fun populateIntentData() {
-        arguments?.getString("mobile_num")?.apply {
+        arguments?.getString("mobile_number")?.apply {
             viewModel.init(this)
             observeRequestModel()
         }
@@ -119,7 +119,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
 
     private fun navigateToAadhaarOtpVerificationScreen() {
         val bundle = bundleOf("genAadhaarOtp" to true)
-        findNavController().navigate(R.id.action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment)
+        findNavController().navigate(R.id.action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment ,bundle)
     }
 
 

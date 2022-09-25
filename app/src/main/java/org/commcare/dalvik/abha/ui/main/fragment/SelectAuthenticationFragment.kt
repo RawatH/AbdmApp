@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.SelectAuthMethodBinding
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
+import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
@@ -102,14 +103,17 @@ class SelectAuthenticationFragment :
         }
     }
 
-
-    override fun onClick(view: View?) {
-        super.onClick(view)
+    private fun getAuthOtp(){
         arguments?.getString("abha_id")?.let { healthId ->
             viewModel.selectedAuthMethod?.let {
                 viewModel.getAuthOtp(healthId, it)
             }
         }
+    }
+
+    override fun onClick(view: View?) {
+        super.onClick(view)
+        getAuthOtp()
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -122,12 +126,16 @@ class SelectAuthenticationFragment :
     private fun navigateToNextScreen() {
         viewModel.selectedAuthMethod?.let {
             if (it.equals("AADHAAR_OTP")) {
+                val bundle = bundleOf("verificationMode" to VerificationMode.CONFIRM_AADHAAR_OTP)
                 findNavController().navigate(
-                    R.id.action_selectAuthenticationFragment_to_verifyAadhaarOtpFragment
+                    R.id.action_selectAuthenticationFragment_to_verifyAadhaarOtpFragment,
+                    bundle
                 )
             } else {
+                val bundle = bundleOf("verificationMode" to VerificationMode.CONFIRM_MOBILE_OTP)
                 findNavController().navigate(
-                    R.id.action_selectAuthenticationFragment_to_verifyMobileOtpFragment
+                    R.id.action_selectAuthenticationFragment_to_verifyMobileOtpFragment,
+                    bundle
                 )
             }
         }

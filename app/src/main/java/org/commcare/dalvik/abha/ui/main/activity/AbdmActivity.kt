@@ -9,6 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.gson.annotations.SerializedName
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ import org.commcare.dalvik.data.network.HeaderInterceptor
 import org.commcare.dalvik.data.util.PrefKeys
 
 import timber.log.Timber
+import java.io.Serializable
 
 @AndroidEntryPoint
 class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::inflate) {
@@ -49,26 +51,27 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         observeOtpFailure()
         checkForBlockScenario()
 
-        intent.extras?.getString("lang_code")?.let{
+        intent.extras?.getString("lang_code")?.let {
             viewmodel.getTranslation(it)
         }
 
     }
 
     private fun checkForBlockScenario() {
-        lifecycleScope.launch(Dispatchers.Main){
-            viewmodel.checkIfBlocked().collect{ ts ->
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewmodel.checkIfBlocked().collect { ts ->
                 ts?.let {
                     val blockTimeSpent = System.currentTimeMillis() - ts.toLong()
                     if (blockTimeSpent < AppConstants.OTP_BLOCK_TS) {
                         val timeLeft = AppConstants.OTP_BLOCK_TS - blockTimeSpent
-                        val minutesLeft = (timeLeft/1000)/60
-                        val secondsLeft = (timeLeft/1000)%60
-                        val timeLeftStr = minutesLeft.toString()+"min : ${secondsLeft}sec"
+                        val minutesLeft = (timeLeft / 1000) / 60
+                        val secondsLeft = (timeLeft / 1000) % 60
+                        val timeLeftStr = minutesLeft.toString() + "min : ${secondsLeft}sec"
                         DialogUtility.showDialog(this@AbdmActivity,
-                            resources.getString(R.string.app_blocked,timeLeftStr) ,
-                            {dispatchResult()},DialogType.Blocking)
-                    }else{
+                            resources.getString(R.string.app_blocked, timeLeftStr),
+                            { dispatchResult() }, DialogType.Blocking
+                        )
+                    } else {
                         viewmodel.clearBlockState()
                     }
                 }
@@ -153,4 +156,14 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         finish()
     }
 
+}
+
+/**
+ * Mode of Verification
+ */
+enum class VerificationMode :Serializable {
+    VERIFY_MOBILE_OTP,
+    VERIFY_AADHAAR_OTP,
+    CONFIRM_MOBILE_OTP,
+    CONFIRM_AADHAAR_OTP
 }

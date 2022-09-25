@@ -5,12 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.model.AbhaVerificationRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
@@ -36,8 +33,10 @@ class GenerateAbhaViewModel @Inject constructor(
     val saveDataUsecase: SaveDataUsecase,
     private val translationUseCase: GetTranslationUseCase,
     private val verifyAadhaarOtpUseCase: VerifyAadhaarOtpUseCase,
-    private val verifyMobileOtpUseCase: VerifyMobileOtpUseCase
-) : BaseViewModel() {
+    private val verifyMobileOtpUseCase: VerifyMobileOtpUseCase,
+    private val confirmAadhaarOtpUsecase: ConfirmAadhaarOtpUsecase,
+    private val confirmMobileOtpUsecase: ConfirmMobileOtpUsecase
+    ) : BaseViewModel() {
 
     var selectedAuthMethod: String? = null
     var otpFailureCount = MutableLiveData(0)
@@ -443,6 +442,72 @@ class GenerateAbhaViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Confirm Auth AADHAAR OTP
+     */
+
+    fun confirmAadhaarAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel){
+        viewModelScope.launch {
+           confirmAadhaarOtpUsecase.execute(verifyOOtpRequestModel).collect{
+               when(it){
+                   HqResponseModel.Loading ->{
+                       uiState.emit(GenerateAbhaUiState.Loading(true))
+                   }
+                   is HqResponseModel.Success ->{
+                       uiState.emit(
+                           GenerateAbhaUiState.Success(
+                               it.value,
+                               RequestType.CONFIRM_AUTH_AADHAAR_OTP
+                           )
+                       )
+
+                   }
+                   is HqResponseModel.AbdmError ->{
+
+                   }
+
+                   is HqResponseModel.Error ->{
+
+                   }
+               }
+
+           }
+        }
+
+    }
+
+    /**
+     * Confirm Auth MOBILE OTP
+     */
+
+    fun confirmMobileAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel){
+        viewModelScope.launch {
+            confirmMobileOtpUsecase.execute(verifyOOtpRequestModel).collect{
+                when(it){
+                    HqResponseModel.Loading ->{
+                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                    }
+                    is HqResponseModel.Success ->{
+                        uiState.emit(
+                            GenerateAbhaUiState.Success(
+                                it.value,
+                                RequestType.CONFIRM_AUTH_MOBILE_OTP
+                            )
+                        )
+                    }
+                    is HqResponseModel.AbdmError ->{
+
+                    }
+
+                    is HqResponseModel.Error ->{
+
+                    }
+                }
+            }
+        }
+
+    }
 }
 
 /**
@@ -476,5 +541,7 @@ enum class RequestType {
     AADHAAR_OTP,
     AADHAAR_OTP_VERIFY,
     AUTH_METHODS,
-    GENERATE_AUTH_OTP
+    GENERATE_AUTH_OTP,
+    CONFIRM_AUTH_AADHAAR_OTP,
+    CONFIRM_AUTH_MOBILE_OTP
 }

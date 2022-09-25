@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import org.commcare.dalvik.abha.databinding.AbhaVerificationResultBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
+import org.commcare.dalvik.domain.model.AbhaVerificationResultModel
 
 class AbhaVerificationResultFragment :
     BaseFragment<AbhaVerificationResultBinding>(AbhaVerificationResultBinding::inflate) {
@@ -12,11 +13,14 @@ class AbhaVerificationResultFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.clickHandler = this
+        arguments?.getSerializable("resultModel")?.let {
+            binding.model = it as AbhaVerificationResultModel
+        }
+
     }
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        Toast.makeText(requireContext() , "DONE", Toast.LENGTH_SHORT).show()
         (activity as AbdmActivity).onAbhaNumberVerification()
     }
 }

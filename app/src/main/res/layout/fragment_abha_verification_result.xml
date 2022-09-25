@@ -8,6 +8,9 @@
         <import type="org.commcare.dalvik.domain.model.TranslationKey" />
 
         <variable
+            name="model"
+            type="org.commcare.dalvik.domain.model.AbhaVerificationResultModel" />
+        <variable
             name="clickHandler"
             type="org.commcare.dalvik.abha.ui.main.fragment.AbhaVerificationResultFragment" />
 
@@ -37,72 +40,102 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:gravity="center"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:translatedTextKey="@{TranslationKey.VERIFICATION_STATUS}" />
-
-        <TextView
-            android:id="@+id/textView5"
-            style="@style/Headline1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
-            app:translatedTextKey="@{TranslationKey.ABHA_NUM}"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toBottomOf="@+id/verification_status" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:translatedTextKey="@{TranslationKey.VERIFICATION_STATUS}"
+            tools:text="Verification status" />
 
-        <TextView
-            android:id="@+id/abhaNumber"
-            style="@style/Headline1"
+        <TableLayout
+            android:id="@+id/aadhaarDataTableLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:text="123456789012"
-            app:layout_constraintBottom_toBottomOf="@+id/textView5"
+            android:orientation="vertical"
+            android:padding="1dp"
+            android:stretchColumns="*"
+            app:layout_constraintBottom_toTopOf="@+id/returnFromVerification"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
-            app:layout_constraintStart_toEndOf="@+id/textView5"
-            app:layout_constraintTop_toTopOf="@+id/textView5" />
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toBottomOf="@+id/verification_status"
+            app:layout_constraintVertical_bias="0.5"
+            android:background="@color/bright_blue_grad_start">
 
-        <TextView
-            android:id="@+id/textView7"
-            style="@style/Headline1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            app:translatedTextKey="@{TranslationKey.STATUS}"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/textView5"
-            app:layout_constraintStart_toStartOf="@+id/textView5"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minHeight="32dp"
+                android:background="@color/white"
+                >
 
-        <TextView
-            android:id="@+id/abhaStatus"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="VERIFIED"
-            style="@style/Headline1"
-            app:layout_constraintBottom_toBottomOf="@+id/textView7"
-            app:layout_constraintEnd_toStartOf="@+id/guideline5"
-            app:layout_constraintStart_toStartOf="@+id/abhaNumber"
-            app:layout_constraintTop_toTopOf="@+id/textView7" />
+                <TextView
+                    style="@style/Headline1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingLeft="2dp"
+                    android:text="ABHA ID :"
+                    />
+
+                <TextView
+                    style="@style/Headline2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingEnd="2dp"
+                    android:paddingRight="2dp"
+                    android:text="@{model.healthId}" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:minHeight="32dp"
+                android:background="@color/bgColor"
+                >
+
+                <TextView
+                    style="@style/Headline1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingStart="2dp"
+                    android:paddingLeft="2dp"
+                    android:text="STATUS :"
+                    />
+
+                <TextView
+                    style="@style/Headline2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingEnd="2dp"
+                    android:paddingRight="2dp"
+                    android:text="@{model.status}" />
+
+            </TableRow>
+
+
+        </TableLayout>
+
+
 
         <Button
             android:id="@+id/returnFromVerification"
             style="@style/RoundStyleButton"
-            android:layout_width="0dp"
+            android:layout_width="379dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
             android:onClickListener="@{clickHandler}"
-            app:translatedTextKey="@{TranslationKey.RETURN}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toBottomOf="@+id/abhaStatus" />
+            app:translatedTextKey="@{TranslationKey.RETURN}"
+            tools:text="Return" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -10,4 +10,6 @@ interface AbdmRepository {
     fun verifyAadhaarOtp(verifyOtpRequestModel: VerifyOtpRequestModel):Flow<HqResponseModel>
     fun getAuthenticationMethods(healthId:String):Flow<HqResponseModel>
     fun generateAuthOtp(generateAuthOtp: GenerateAuthOtpModel):Flow<HqResponseModel>
+    fun confirmMobileOtp(otpModel:VerifyOtpRequestModel):Flow<HqResponseModel>
+    fun confirmAadhaarOtp(otpModel:VerifyOtpRequestModel):Flow<HqResponseModel>
 }

@@ -28,4 +28,10 @@ interface HqServices {
     @GET("get_auth_methods")
     suspend fun getAuthenticationMethods(@Query("health_id") healthId:String):Response<JsonObject>
 
+    @POST("confirm_with_aadhaar_otp")
+    suspend fun confirmAadhaarOtp(@Body verifyOtpRequestModel: VerifyOtpRequestModel):Response<JsonObject>
+
+    @POST("confirm_with_mobile_otp")
+    suspend fun confirmMobileOtp(@Body verifyOtpRequestModel: VerifyOtpRequestModel):Response<JsonObject>
+
 }

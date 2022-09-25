@@ -31,6 +31,18 @@ class AbdmRepositoryImpl @Inject constructor(val hqServices: HqServices) : AbdmR
             hqServices.generateAuthOtp(generateAuthOtp)
         }
 
+    override fun confirmMobileOtp(otpModel: VerifyOtpRequestModel): Flow<HqResponseModel> =
+        safeApiCall {
+            hqServices.confirmMobileOtp(otpModel)
+        }
+
+
+    override fun confirmAadhaarOtp(otpModel: VerifyOtpRequestModel): Flow<HqResponseModel>  =
+        safeApiCall {
+            hqServices.confirmAadhaarOtp(otpModel)
+        }
+
+
 
     override fun verifyMobileOtp(verifyOtpRequestModel: VerifyOtpRequestModel): Flow<HqResponseModel> =
         safeApiCall {
