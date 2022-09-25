@@ -14,7 +14,8 @@ class AbhaVerificationResultFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.clickHandler = this
         arguments?.getSerializable("resultModel")?.let {
-            binding.model = it as AbhaVerificationResultModel
+            it as AbhaVerificationResultModel
+            binding.model = it
         }
 
     }

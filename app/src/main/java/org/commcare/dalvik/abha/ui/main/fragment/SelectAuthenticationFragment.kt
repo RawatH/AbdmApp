@@ -103,7 +103,7 @@ class SelectAuthenticationFragment :
         }
     }
 
-    private fun getAuthOtp(){
+    private fun getAuthOtp() {
         arguments?.getString("abha_id")?.let { healthId ->
             viewModel.selectedAuthMethod?.let {
                 viewModel.getAuthOtp(healthId, it)
@@ -126,13 +126,18 @@ class SelectAuthenticationFragment :
     private fun navigateToNextScreen() {
         viewModel.selectedAuthMethod?.let {
             if (it.equals("AADHAAR_OTP")) {
-                val bundle = bundleOf("verificationMode" to VerificationMode.CONFIRM_AADHAAR_OTP)
+                val bundle = bundleOf(
+                    "verificationMode" to VerificationMode.CONFIRM_AADHAAR_OTP,
+                    "abhaId" to arguments?.getString("abha_id")
+                )
                 findNavController().navigate(
                     R.id.action_selectAuthenticationFragment_to_verifyAadhaarOtpFragment,
                     bundle
                 )
             } else {
-                val bundle = bundleOf("verificationMode" to VerificationMode.CONFIRM_MOBILE_OTP)
+                val bundle = bundleOf("verificationMode" to VerificationMode.CONFIRM_MOBILE_OTP,
+                    "abhaId" to arguments?.getString("abha_id")
+                )
                 findNavController().navigate(
                     R.id.action_selectAuthenticationFragment_to_verifyMobileOtpFragment,
                     bundle

@@ -70,6 +70,9 @@ class VerifyMobileOtpFragment :
                                         it.data,
                                         AbhaVerificationResultModel::class.java
                                     )
+                                    arguments?.getString("abhaId")?.let {
+                                        abhaVerificationResultModel.healthId =it
+                                    }
                                     val bundle = bundleOf("resultModel" to abhaVerificationResultModel)
                                     navigateToNextScreen(RequestType.CONFIRM_AUTH_MOBILE_OTP,bundle)
                                 }
