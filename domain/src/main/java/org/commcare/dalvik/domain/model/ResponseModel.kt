@@ -25,4 +25,4 @@ class AbdmErrorDetail() {
 
 data class OtpResponseModel(val txnId:String)
 
-data class AbhaVerificationResultModel(val status:String , var healthId :String):Serializable
+data class AbhaVerificationResultModel(val status:String = "" , var healthId :String):Serializable
