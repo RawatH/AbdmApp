@@ -1,5 +1,6 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -22,6 +23,11 @@ class AbhaVerificationResultFragment :
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        (activity as AbdmActivity).onAbhaNumberVerification()
+        val intent = Intent().apply {
+            putExtra("health_id",binding.model?.healthId)
+            putExtra("verified",binding.model?.status)
+        }
+
+        (activity as AbdmActivity).onAbhaNumberVerification(intent)
     }
 }

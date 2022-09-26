@@ -97,7 +97,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                             Timber.d("XXXXXXXX" + it.data)
                             binding.generateOtp.isEnabled = true
                             binding.aadharNumberEt.isEnabled = true
-                            DialogUtility.showDialog(requireContext(), it.data.toString() , type = DialogType.Blocking )
+                            DialogUtility.showDialog(requireContext(), it.data.toString() , type = DialogType.Blocking)
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
                         is  GenerateAbhaUiState.AbdmError->{

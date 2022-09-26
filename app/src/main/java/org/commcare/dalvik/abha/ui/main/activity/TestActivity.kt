@@ -57,8 +57,8 @@ class TestActivity : AppCompatActivity() {
         startActivityForResult(intent, REQ_CODE_B)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
         Timber.d("OnActivityResult--------${resultCode}")
 
         when (requestCode) {

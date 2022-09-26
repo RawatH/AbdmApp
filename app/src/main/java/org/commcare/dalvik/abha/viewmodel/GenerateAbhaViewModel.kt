@@ -86,7 +86,7 @@ class GenerateAbhaViewModel @Inject constructor(
      * Req AadhaarOtp
      */
     fun requestAadhaarOtp() {
-        viewModelScope.launch(Dispatchers.Main) {
+        viewModelScope.launch {
             val aadhaarOtpResponse = async {
                 val aadhaarOtpFlow = reqAadhaarOtpUsecase.execute(abhaRequestModel.value!!.aadhaar)
                 aadhaarOtpFlow.collect {
@@ -133,7 +133,7 @@ class GenerateAbhaViewModel @Inject constructor(
     }
 
     /**
-     * Re Mobile Otp
+     * Request Mobile Otp
      */
     fun requestMobileOtp() {
         viewModelScope.launch {
@@ -142,6 +142,12 @@ class GenerateAbhaViewModel @Inject constructor(
                 abhaRequestModel.value!!.txnId
             ).collect {
                 when (it) {
+
+                    is HqResponseModel.Loading -> {
+                        Timber.d("EMIT Sending -> GenerateAbhaUiState.MobileOtpRequested")
+                        uiState.emit(GenerateAbhaUiState.MobileOtpRequested)
+                    }
+
                     is HqResponseModel.Success -> {
                         uiState.emit(
                             GenerateAbhaUiState.Success(
@@ -160,37 +166,9 @@ class GenerateAbhaViewModel @Inject constructor(
                         )
                     }
 
-                    is HqResponseModel.Loading -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(true))
-                    }
                 }
             }
         }
-    }
-
-    /**
-     * Get data from data store
-     */
-    fun getData(key: Preferences.Key<String>) {
-        viewModelScope.launch {
-            saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey()).collect {
-                Timber.d("OTP TS : ${it}")
-            }
-        }
-    }
-
-    /**
-     * Save data in data store
-     */
-    private fun saveData(key: Preferences.Key<String>, value: String) {
-        saveDataUsecase.executeSave(value, key)
-    }
-
-    /**
-     * Increase count by 1
-     */
-    private fun incOtpFailureCount() {
-        otpFailureCount.value = otpFailureCount.value!!.inc()
     }
 
     /**
@@ -241,7 +219,7 @@ class GenerateAbhaViewModel @Inject constructor(
             verifyMobileOtpUseCase.execute(verifyMobileOtpRequestModel).collect {
                 when (it) {
                     HqResponseModel.Loading -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                        uiState.emit(GenerateAbhaUiState.VerifyMobileOtpRequested)
                     }
 
                     is HqResponseModel.Success -> {
@@ -292,7 +270,6 @@ class GenerateAbhaViewModel @Inject constructor(
                     }
                     is HqResponseModel.Error -> {
                         uiState.emit(GenerateAbhaUiState.Loading(false))
-
                     }
                     is HqResponseModel.AbdmError -> {
                         uiState.emit(
@@ -307,26 +284,6 @@ class GenerateAbhaViewModel @Inject constructor(
             }
         }
 
-    }
-
-
-    /**
-     * Reset block state
-     */
-    fun clearBlockState() {
-        saveDataUsecase.removeKey(PrefKeys.OTP_BLOCKED_TS.getKey())
-    }
-
-    /**
-     * Fetch Translations
-     */
-    fun getTranslation(langCode: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            translationUseCase.execute(langCode)?.let {
-                LanguageManager.translationModel = it
-                uiState.emit(GenerateAbhaUiState.TranslationReceived)
-            } ?: Timber.d("Unable to fetch translations ")
-        }
     }
 
     /**
@@ -426,7 +383,12 @@ class GenerateAbhaViewModel @Inject constructor(
 
                     }
                     is HqResponseModel.AbdmError -> {
-
+                        uiState.emit(
+                            GenerateAbhaUiState.AbdmError(
+                                it.value,
+                                RequestType.CONFIRM_AUTH_AADHAAR_OTP
+                            )
+                        )
                     }
 
                     is HqResponseModel.Error -> {
@@ -448,7 +410,7 @@ class GenerateAbhaViewModel @Inject constructor(
             confirmMobileOtpUsecase.execute(verifyOOtpRequestModel).collect {
                 when (it) {
                     HqResponseModel.Loading -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                        uiState.emit(GenerateAbhaUiState.VerifyAuthOtpRequested)
                     }
                     is HqResponseModel.Success -> {
                         uiState.emit(
@@ -459,17 +421,68 @@ class GenerateAbhaViewModel @Inject constructor(
                         )
                     }
                     is HqResponseModel.AbdmError -> {
-
+                        uiState.emit(
+                            GenerateAbhaUiState.AbdmError(
+                                it.value,
+                                RequestType.CONFIRM_AUTH_MOBILE_OTP
+                            )
+                        )
                     }
 
                     is HqResponseModel.Error -> {
-
+                        uiState.emit(GenerateAbhaUiState.Loading(false))
                     }
                 }
             }
         }
 
     }
+
+
+    /**
+     * Reset block state
+     */
+    fun clearBlockState() {
+        saveDataUsecase.removeKey(PrefKeys.OTP_BLOCKED_TS.getKey())
+    }
+
+    /**
+     * Fetch Translations
+     */
+    fun getTranslation(langCode: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            translationUseCase.execute(langCode)?.let {
+                LanguageManager.translationModel = it
+                uiState.emit(GenerateAbhaUiState.TranslationReceived)
+            } ?: Timber.d("Unable to fetch translations ")
+        }
+    }
+
+    /**
+     * Get data from data store
+     */
+    fun getData(key: Preferences.Key<String>) {
+        viewModelScope.launch {
+            saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey()).collect {
+                Timber.d("OTP TS : ${it}")
+            }
+        }
+    }
+
+    /**
+     * Save data in data store
+     */
+    private fun saveData(key: Preferences.Key<String>, value: String) {
+        saveDataUsecase.executeSave(value, key)
+    }
+
+    /**
+     * Increase count by 1
+     */
+    private fun incOtpFailureCount() {
+        otpFailureCount.value = otpFailureCount.value!!.inc()
+    }
+
 }
 
 /**

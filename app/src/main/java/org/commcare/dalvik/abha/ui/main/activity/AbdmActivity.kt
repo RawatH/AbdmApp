@@ -68,7 +68,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
                         val timeLeftStr = minutesLeft.toString() + "min : ${secondsLeft}sec"
                         DialogUtility.showDialog(this@AbdmActivity,
                             resources.getString(R.string.app_blocked, timeLeftStr),
-                            { dispatchResult() }, DialogType.Blocking
+                            { dispatchResult(Intent()) }, DialogType.Blocking
                         )
                     } else {
                         viewmodel.clearBlockState()
@@ -138,19 +138,19 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         navController.setGraph(graph, bundle)
     }
 
-    fun onAbhaNumberReceived() {
-        finish()
+    fun onAbhaNumberReceived(intent:Intent) {
+        dispatchResult(intent)
     }
 
-    fun onAbhaNumberVerification() {
-        finish()
+    fun onAbhaNumberVerification(intent: Intent) {
+        dispatchResult(intent)
     }
 
     override fun getNavHostId(): Int {
         return R.id.nav_host_fragment
     }
 
-    private fun dispatchResult(intent: Intent? = null) {
+    private fun dispatchResult(intent: Intent) {
         setResult(111, intent)
         finish()
     }

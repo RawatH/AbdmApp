@@ -45,6 +45,7 @@ class TimeProgressBar @JvmOverloads constructor(
         CoroutineScope(Dispatchers.Main).launch {
             timeState.emit(OtpTimerState.TimerStarted)
             visibility = View.VISIBLE
+            counterView.text = pb.progress.toString()
             while (pb.progress > 0){
                 delay(1000)
                 pb.progress = pb.progress - 1
