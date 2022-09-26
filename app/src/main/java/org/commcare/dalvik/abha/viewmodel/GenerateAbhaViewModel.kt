@@ -7,12 +7,9 @@ import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.model.AbhaVerificationRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
-import org.commcare.dalvik.abha.utility.DialogType
-import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.PropMutableLiveData
 import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
@@ -36,11 +33,12 @@ class GenerateAbhaViewModel @Inject constructor(
     private val verifyMobileOtpUseCase: VerifyMobileOtpUseCase,
     private val confirmAadhaarOtpUsecase: ConfirmAadhaarOtpUsecase,
     private val confirmMobileOtpUsecase: ConfirmMobileOtpUsecase
-    ) : BaseViewModel() {
+) : BaseViewModel() {
 
     var selectedAuthMethod: String? = null
     var otpFailureCount = MutableLiveData(0)
-    var abhaVerificationRequestModel:MutableLiveData<AbhaVerificationRequestModel> = MutableLiveData()
+    var abhaVerificationRequestModel: MutableLiveData<AbhaVerificationRequestModel> =
+        MutableLiveData()
     var abhaRequestModel: PropMutableLiveData<AbhaNumberRequestModel> = PropMutableLiveData()
     val abhaDetailModel: MutableLiveData<AbhaDetailModel> = MutableLiveData()
 
@@ -88,15 +86,17 @@ class GenerateAbhaViewModel @Inject constructor(
      * Req AadhaarOtp
      */
     fun requestAadhaarOtp() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             val aadhaarOtpResponse = async {
                 val aadhaarOtpFlow = reqAadhaarOtpUsecase.execute(abhaRequestModel.value!!.aadhaar)
                 aadhaarOtpFlow.collect {
                     when (it) {
                         is HqResponseModel.Loading -> {
-                            uiState.emit(GenerateAbhaUiState.Loading(true))
+                            Timber.d("EMIT Sending -> GenerateAbhaUiState.AadhaarOtpRequested")
+                            uiState.emit(GenerateAbhaUiState.AadhaarOtpRequested)
                         }
                         is HqResponseModel.Success -> {
+                            Timber.d("EMIT Sending -> GenerateAbhaUiState.Success")
                             uiState.emit(
                                 GenerateAbhaUiState.Success(
                                     it.value,
@@ -105,6 +105,7 @@ class GenerateAbhaViewModel @Inject constructor(
                             )
                         }
                         is HqResponseModel.Error -> {
+                            Timber.d("EMIT Sending -> GenerateAbhaUiState.Error")
                             uiState.emit(
                                 GenerateAbhaUiState.Error(
                                     it.value,
@@ -113,6 +114,7 @@ class GenerateAbhaViewModel @Inject constructor(
                             )
                         }
                         is HqResponseModel.AbdmError -> {
+                            Timber.d("EMIT Sending -> GenerateAbhaUiState.AbdmError")
                             uiState.emit(
                                 GenerateAbhaUiState.AbdmError(
                                     it.value,
@@ -122,6 +124,8 @@ class GenerateAbhaViewModel @Inject constructor(
                         }
                     }
                 }
+
+//                saveData(PrefKeys.OTP_BLOCKED_TS.getKey(), System.currentTimeMillis().toString())
             }
 
             aadhaarOtpResponse.await()
@@ -142,7 +146,7 @@ class GenerateAbhaViewModel @Inject constructor(
                         uiState.emit(
                             GenerateAbhaUiState.Success(
                                 it.value,
-                                RequestType.MOBILE_OTP_RESEND
+                                RequestType.MOBILE_OTP
                             )
                         )
                     }
@@ -151,7 +155,7 @@ class GenerateAbhaViewModel @Inject constructor(
                         uiState.emit(
                             GenerateAbhaUiState.Error(
                                 it.value,
-                                RequestType.MOBILE_OTP_RESEND
+                                RequestType.MOBILE_OTP
                             )
                         )
                     }
@@ -273,7 +277,8 @@ class GenerateAbhaViewModel @Inject constructor(
             verifyAadhaarOtpUseCase.execute(verifyOtpRequestModel).collect {
                 when (it) {
                     HqResponseModel.Loading -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                        Timber.d("EMIT Sending -> GenerateAbhaUiState.VerifyAadhaarOtpRequested")
+                        uiState.emit(GenerateAbhaUiState.VerifyAadhaarOtpRequested)
                     }
 
                     is HqResponseModel.Success -> {
@@ -290,63 +295,20 @@ class GenerateAbhaViewModel @Inject constructor(
 
                     }
                     is HqResponseModel.AbdmError -> {
-                        GenerateAbhaUiState.AbdmError(
-                            it.value,
-                            RequestType.AADHAAR_OTP_VERIFY
-                        )
-                    }
-
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Resend Aadhaar OTP request
-     */
-    fun resendAadhaarOtpRequest() {
-
-        viewModelScope.launch(Dispatchers.Main) {
-            uiState.emit(GenerateAbhaUiState.AadhaarOtpRequested)
-
-            uiState.emit(GenerateAbhaUiState.Loading(true))
-            delay(2000)
-            val errJson = JsonObject()
-            errJson.addProperty("msg", "OTP failed")
-            uiState.emit(GenerateAbhaUiState.Error(errJson, RequestType.AADHAAR_OTP))
-
-
-            reqAadhaarOtpUsecase.execute(abhaRequestModel.value!!.aadhaar).collect {
-
-                when (it) {
-                    is HqResponseModel.Loading -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(true))
-                    }
-                    is HqResponseModel.Success -> {
                         uiState.emit(
-                            GenerateAbhaUiState.Success(
+                            GenerateAbhaUiState.AbdmError(
                                 it.value,
-                                RequestType.AADHAAR_OTP
+                                RequestType.AADHAAR_OTP_VERIFY
                             )
                         )
                     }
-                    is HqResponseModel.Error -> {
-                        incOtpFailureCount()
-                        uiState.emit(
-                            GenerateAbhaUiState.Error(
-                                JsonObject(),
-                                RequestType.AADHAAR_OTP
-                            )
-                        )
-                    }
+
                 }
             }
-
-//            saveData(PrefKeys.OTP_BLOCKED_TS.getKey(), System.currentTimeMillis().toString())
-
         }
+
     }
+
 
     /**
      * Reset block state
@@ -375,7 +337,7 @@ class GenerateAbhaViewModel @Inject constructor(
             generateAuthOtpUsecase.execute(healthId, authMethod).collect {
                 when (it) {
                     HqResponseModel.Loading -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                        uiState.emit(GenerateAbhaUiState.AuthOtpRequested)
                     }
 
                     is HqResponseModel.Success -> {
@@ -447,32 +409,32 @@ class GenerateAbhaViewModel @Inject constructor(
      * Confirm Auth AADHAAR OTP
      */
 
-    fun confirmAadhaarAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel){
+    fun confirmAadhaarAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel) {
         viewModelScope.launch {
-           confirmAadhaarOtpUsecase.execute(verifyOOtpRequestModel).collect{
-               when(it){
-                   HqResponseModel.Loading ->{
-                       uiState.emit(GenerateAbhaUiState.Loading(true))
-                   }
-                   is HqResponseModel.Success ->{
-                       uiState.emit(
-                           GenerateAbhaUiState.Success(
-                               it.value,
-                               RequestType.CONFIRM_AUTH_AADHAAR_OTP
-                           )
-                       )
+            confirmAadhaarOtpUsecase.execute(verifyOOtpRequestModel).collect {
+                when (it) {
+                    HqResponseModel.Loading -> {
+                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                    }
+                    is HqResponseModel.Success -> {
+                        uiState.emit(
+                            GenerateAbhaUiState.Success(
+                                it.value,
+                                RequestType.CONFIRM_AUTH_AADHAAR_OTP
+                            )
+                        )
 
-                   }
-                   is HqResponseModel.AbdmError ->{
+                    }
+                    is HqResponseModel.AbdmError -> {
 
-                   }
+                    }
 
-                   is HqResponseModel.Error ->{
+                    is HqResponseModel.Error -> {
 
-                   }
-               }
+                    }
+                }
 
-           }
+            }
         }
 
     }
@@ -481,14 +443,14 @@ class GenerateAbhaViewModel @Inject constructor(
      * Confirm Auth MOBILE OTP
      */
 
-    fun confirmMobileAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel){
+    fun confirmMobileAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel) {
         viewModelScope.launch {
-            confirmMobileOtpUsecase.execute(verifyOOtpRequestModel).collect{
-                when(it){
-                    HqResponseModel.Loading ->{
+            confirmMobileOtpUsecase.execute(verifyOOtpRequestModel).collect {
+                when (it) {
+                    HqResponseModel.Loading -> {
                         uiState.emit(GenerateAbhaUiState.Loading(true))
                     }
-                    is HqResponseModel.Success ->{
+                    is HqResponseModel.Success -> {
                         uiState.emit(
                             GenerateAbhaUiState.Success(
                                 it.value,
@@ -496,11 +458,11 @@ class GenerateAbhaViewModel @Inject constructor(
                             )
                         )
                     }
-                    is HqResponseModel.AbdmError ->{
+                    is HqResponseModel.AbdmError -> {
 
                     }
 
-                    is HqResponseModel.Error ->{
+                    is HqResponseModel.Error -> {
 
                     }
                 }
@@ -515,18 +477,20 @@ class GenerateAbhaViewModel @Inject constructor(
  */
 sealed class GenerateAbhaUiState {
     data class Loading(val isLoading: Boolean) : GenerateAbhaUiState()
+
     object TranslationReceived : GenerateAbhaUiState()
     object ValidState : GenerateAbhaUiState()
     object InvalidState : GenerateAbhaUiState()
-    object MobileAadhaarOtpGenerated : GenerateAbhaUiState()
     object MobileOtpRequested : GenerateAbhaUiState()
     object AadhaarOtpRequested : GenerateAbhaUiState()
-    object MobileOtpVerified : GenerateAbhaUiState()
-    object AadhaarOtpVerified : GenerateAbhaUiState()
+    object AuthOtpRequested :GenerateAbhaUiState()
+    object VerifyAuthOtpRequested :GenerateAbhaUiState()
+    object VerifyMobileOtpRequested : GenerateAbhaUiState()
+    object VerifyAadhaarOtpRequested : GenerateAbhaUiState()
     object Blocked : GenerateAbhaUiState()
+
     data class Success(val data: JsonObject, val requestType: RequestType) :
         GenerateAbhaUiState()
-
     data class Error(val data: JsonObject, val requestType: RequestType) : GenerateAbhaUiState()
     data class AbdmError(val data: AbdmErrorModel, val requestType: RequestType) :
         GenerateAbhaUiState()
@@ -536,12 +500,17 @@ sealed class GenerateAbhaUiState {
  * Request type sent
  */
 enum class RequestType {
-    MOBILE_OTP_RESEND,
+    MOBILE_OTP,
     MOBILE_OTP_VERIFY,
+
     AADHAAR_OTP,
     AADHAAR_OTP_VERIFY,
+
     AUTH_METHODS,
+
     GENERATE_AUTH_OTP,
+    VERIFY_AUTH_OTP,
+
     CONFIRM_AUTH_AADHAAR_OTP,
     CONFIRM_AUTH_MOBILE_OTP
 }

@@ -13,8 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyAadhaarOtpBinding
+import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
-import org.commcare.dalvik.abha.ui.main.custom.ProgressState
+import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
@@ -22,10 +23,11 @@ import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
-import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.AbhaVerificationResultModel
 import org.commcare.dalvik.domain.model.OtpResponseModel
+import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
+import timber.log.Timber
 
 class VerifyAadhaarOtpFragment :
     BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadhaarOtpBinding::inflate) {
@@ -46,28 +48,80 @@ class VerifyAadhaarOtpFragment :
             }
         }
 
-        arguments?.containsKey("genAadhaarOtp")?.let {
-            viewModel.requestAadhaarOtp()
+        /**
+         * Request for OTP
+         */
+        arguments?.getSerializable("verificationMode")?.let {
+            it as VerificationMode
+            when (it){
+                VerificationMode.VERIFY_AADHAAR_OTP ->{
+                    requestAadhaarOtp()
+                }
+                VerificationMode.CONFIRM_AADHAAR_OTP ->{
+                    requestAadhaarAuthOtp()
+                }
+            }
         }
 
     }
 
+    private fun requestAadhaarOtp(){
+        viewModel.requestAadhaarOtp()
+    }
+
+    private fun requestAadhaarAuthOtp(){
+        arguments?.getString("abhaId")?.let { healthId ->
+            viewModel.selectedAuthMethod?.let {
+                viewModel.getAuthOtp(healthId, it)
+            }
+        }
+    }
+
+    /**
+     * Observer UI STATE
+     */
     private fun observeUiState() {
         lifecycleScope.launch(Dispatchers.Main) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
+                    Timber.d("EMIT Received -> ${it}")
                     when (it) {
 
                         GenerateAbhaUiState.InvalidState -> {
 
                         }
 
-                        GenerateAbhaUiState.MobileOtpRequested -> {
+
+                        GenerateAbhaUiState.AuthOtpRequested,
+                        GenerateAbhaUiState.AadhaarOtpRequested -> {
+                            Timber.d("--------- OTP REQUESTED -----------")
                             binding.resentOtp.isEnabled = false
+                            binding.verifyOtp.isEnabled = false
+                            binding.aadhaarOtpEt.setText("")
+                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(true))
                         }
 
+                        GenerateAbhaUiState.VerifyAadhaarOtpRequested->{
+                            Timber.d("--------- VERIFY AADHAAR OTP REQUESTED-----------")
+                            binding.resentOtp.isEnabled = false
+                            binding.verifyOtp.isEnabled = false
+                            binding.aadhaarOtpEt.isEnabled = false
+                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(true))
+                        }
+
+                        /**
+                         * SUCCESS
+                         */
                         is GenerateAbhaUiState.Success -> {
                             when (it.requestType) {
+                                RequestType.GENERATE_AUTH_OTP -> {
+                                    val otResponseModel =
+                                        Gson().fromJson(it.data, OtpResponseModel::class.java)
+                                    viewModel.abhaRequestModel.setValue(AbhaNumberRequestModel(""))
+                                    viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
+                                    binding.timeProgress.startTimer()
+                                }
+
                                 RequestType.CONFIRM_AUTH_AADHAAR_OTP -> {
                                     val abhaVerificationResultModel = Gson().fromJson(
                                         it.data,
@@ -82,6 +136,7 @@ class VerifyAadhaarOtpFragment :
                                 }
 
                                 RequestType.AADHAAR_OTP -> {
+                                    binding.timeProgress.startTimer()
                                     val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
                                     viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
@@ -94,21 +149,32 @@ class VerifyAadhaarOtpFragment :
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 
+                        /**
+                         * ERROR
+                         */
+
                         is GenerateAbhaUiState.Error -> {
                             when (it.requestType) {
                                 RequestType.AADHAAR_OTP -> {
+                                    binding.resentOtp.isEnabled = true
                                     binding.verifyOtp.isEnabled =
                                         binding.aadhaarOtpEt.text?.isNotEmpty() ?: false
                                     binding.timeProgress.startTimer()
                                 }
                                 RequestType.AADHAAR_OTP_VERIFY -> {
                                     binding.verifyOtp.text = ""
+                                }
 
+                                RequestType.GENERATE_AUTH_OTP -> {
+                                    Timber.d("Error AADHAAR AUTH OTP")
                                 }
                             }
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 
+                        /**
+                         * ABDM ERROR
+                         */
                         is GenerateAbhaUiState.AbdmError -> {
                             when (it.requestType) {
                                 RequestType.AADHAAR_OTP -> {
@@ -117,8 +183,12 @@ class VerifyAadhaarOtpFragment :
                                     binding.timeProgress.startTimer()
                                 }
                                 RequestType.AADHAAR_OTP_VERIFY -> {
-                                    binding.verifyOtp.text = ""
-
+                                    binding.aadhaarOtpEt.setText("")
+                                    binding.aadhaarOtpEt.isEnabled = true
+                                    binding.verifyOtp.isEnabled = true
+                                    if(binding.timeProgress.timeState.value != OtpTimerState.TimerStarted){
+                                        binding.resentOtp.isEnabled = true
+                                    }
                                 }
                             }
                             DialogUtility.showDialog(
@@ -136,12 +206,15 @@ class VerifyAadhaarOtpFragment :
 
     private fun observeOtpTimer() {
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.timeProgress.timestate.collect {
+            binding.timeProgress.timeState.collect {
                 when (it) {
-                    ProgressState.TimeoutStarted -> {
+                    OtpTimerState.None ->{
+                       // Nothing for now
+                    }
+                    OtpTimerState.TimerStarted -> {
                         binding.resentOtp.isEnabled = false
                     }
-                    ProgressState.TimeoutOver -> {
+                    OtpTimerState.TimerOver -> {
                         binding.resentOtp.isEnabled = true
                         viewModel.getData(PrefKeys.OTP_BLOCKED_TS.getKey())
                     }
@@ -150,7 +223,7 @@ class VerifyAadhaarOtpFragment :
         }
     }
 
-    private fun getAaadhaarOtpVeriyModel() = VerifyOtpRequestModel(
+    private fun getAadhaarOtpVeriyModel() = VerifyOtpRequestModel(
         viewModel.abhaRequestModel.value?.txnId!!,
         binding.aadhaarOtpEt.text.toString()
     )
@@ -162,12 +235,10 @@ class VerifyAadhaarOtpFragment :
             R.id.resentOtp -> {
                 when (verificationMode) {
                     VerificationMode.CONFIRM_AADHAAR_OTP -> {
-                        viewModel.confirmAadhaarAuthOtp(getAaadhaarOtpVeriyModel())
+                        requestAadhaarAuthOtp()
                     }
-                    else -> {
-                        binding.aadhaarOtpEt.setText("")
-                        binding.resentOtp.isEnabled = false
-                        viewModel.resendAadhaarOtpRequest()
+                    VerificationMode.VERIFY_AADHAAR_OTP -> {
+                        viewModel.requestAadhaarOtp()
                     }
                 }
 
@@ -176,10 +247,10 @@ class VerifyAadhaarOtpFragment :
             R.id.verifyOtp -> {
                 when (verificationMode) {
                     VerificationMode.CONFIRM_AADHAAR_OTP -> {
-                        viewModel.confirmAadhaarAuthOtp(getAaadhaarOtpVeriyModel())
+                        viewModel.confirmAadhaarAuthOtp(getAadhaarOtpVeriyModel())
                     }
                     else -> {
-                        viewModel.verifyAadhaarOtp(getAaadhaarOtpVeriyModel())
+                        viewModel.verifyAadhaarOtp(getAadhaarOtpVeriyModel())
                     }
                 }
             }
@@ -196,8 +267,10 @@ class VerifyAadhaarOtpFragment :
                 )
             }
             RequestType.AADHAAR_OTP_VERIFY ->{
+                val bundle = bundleOf("verificationMode" to VerificationMode.VERIFY_MOBILE_OTP)
                 findNavController().navigate(
-                    R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment
+                    R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment,
+                    bundle
                 )
             }
 

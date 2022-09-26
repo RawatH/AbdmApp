@@ -20,7 +20,7 @@ class AbdmErrorModel() {
 class AbdmErrorDetail() {
     lateinit var message: String
     lateinit var code: String
-    var attribute: JsonObject? = null
+    lateinit var attribute: Any
 }
 
 data class OtpResponseModel(val txnId:String)

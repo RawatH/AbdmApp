@@ -19,8 +19,8 @@ class TimeProgressBar @JvmOverloads constructor(
 
     var counter: Int = 0
     val pb: CircularProgressIndicator by lazy { findViewById(R.id.progressBar) }
-    val counterView: TextView by lazy { findViewById(R.id.progressCount) }
-    val timestate:MutableStateFlow<ProgressState> = MutableStateFlow(ProgressState.TimeoutOver)
+    private val counterView: TextView by lazy { findViewById(R.id.progressCount) }
+    val timeState:MutableStateFlow<OtpTimerState> = MutableStateFlow(OtpTimerState.None)
 
 
     init {
@@ -39,26 +39,26 @@ class TimeProgressBar @JvmOverloads constructor(
                 }
             }
         }
-//        visibility = GONE
     }
 
     fun startTimer(){
         CoroutineScope(Dispatchers.Main).launch {
-            timestate.emit(ProgressState.TimeoutStarted)
+            timeState.emit(OtpTimerState.TimerStarted)
             visibility = View.VISIBLE
             while (pb.progress > 0){
-                delay(10)
+                delay(1000)
                 pb.progress = pb.progress - 1
                 counterView.text = pb.progress.toString()
             }
             visibility = View.GONE
-            timestate.emit(ProgressState.TimeoutOver)
+            timeState.emit(OtpTimerState.TimerOver)
             pb.progress = pb.max
         }
     }
 }
 
-sealed class ProgressState {
-    object TimeoutStarted:ProgressState()
-    object TimeoutOver:ProgressState()
+sealed class OtpTimerState {
+    object None:OtpTimerState()
+    object TimerStarted:OtpTimerState()
+    object TimerOver:OtpTimerState()
 }

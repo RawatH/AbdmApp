@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.EnterAadhaarBinding
+import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.checkMobileFirstNumber
@@ -118,7 +119,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
     }
 
     private fun navigateToAadhaarOtpVerificationScreen() {
-        val bundle = bundleOf("genAadhaarOtp" to true)
+        val bundle = bundleOf("verificationMode" to VerificationMode.VERIFY_AADHAAR_OTP)
         findNavController().navigate(R.id.action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment ,bundle)
     }
 

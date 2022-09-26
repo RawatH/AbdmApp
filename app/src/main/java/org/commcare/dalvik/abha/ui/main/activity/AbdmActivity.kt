@@ -29,7 +29,6 @@ import java.io.Serializable
 @AndroidEntryPoint
 class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::inflate) {
 
-    private val TAG = "AbdmActivity"
     private lateinit var navHostFragment: NavHostFragment
     val viewmodel: GenerateAbhaViewModel by viewModels()
 
@@ -103,10 +102,10 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         lifecycleScope.launch(Dispatchers.Main) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewmodel.uiState.collect {
-                    Timber.d("ABDM FLOW -> ${it}")
+                    Timber.d("EMISSION -> ${it}")
                     when (it) {
                         is GenerateAbhaUiState.Loading -> {
-                            Log.d(TAG, "LOADER VISIBILITY ${it.isLoading}")
+                            Timber.d( "LOADER VISIBILITY ${it.isLoading}")
                             binding.loader.visibility =
                                 if (it.isLoading) View.VISIBLE else View.GONE
                         }
@@ -151,7 +150,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         return R.id.nav_host_fragment
     }
 
-    fun dispatchResult(intent: Intent? = null) {
+    private fun dispatchResult(intent: Intent? = null) {
         setResult(111, intent)
         finish()
     }

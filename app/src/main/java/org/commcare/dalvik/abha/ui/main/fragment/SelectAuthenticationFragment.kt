@@ -51,13 +51,6 @@ class SelectAuthenticationFragment :
                     when (it) {
                         is GenerateAbhaUiState.Success -> {
                             when (it.requestType) {
-                                RequestType.GENERATE_AUTH_OTP -> {
-                                    val otResponseModel =
-                                        Gson().fromJson(it.data, OtpResponseModel::class.java)
-                                    viewModel.abhaRequestModel.setValue(AbhaNumberRequestModel(""))
-                                    viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
-                                    navigateToNextScreen()
-                                }
                                 RequestType.AUTH_METHODS -> {
                                     val filter = listOf("AADHAAR_OTP", "MOBILE_OTP")
                                     val authList = mutableListOf<String>()
@@ -103,17 +96,10 @@ class SelectAuthenticationFragment :
         }
     }
 
-    private fun getAuthOtp() {
-        arguments?.getString("abha_id")?.let { healthId ->
-            viewModel.selectedAuthMethod?.let {
-                viewModel.getAuthOtp(healthId, it)
-            }
-        }
-    }
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        getAuthOtp()
+        navigateToNextScreen()
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -125,8 +111,9 @@ class SelectAuthenticationFragment :
 
     private fun navigateToNextScreen() {
         viewModel.selectedAuthMethod?.let {
-            if (it.equals("AADHAAR_OTP")) {
+            if (it == "AADHAAR_OTP") {
                 val bundle = bundleOf(
+                    "authMethod" to viewModel.selectedAuthMethod ,
                     "verificationMode" to VerificationMode.CONFIRM_AADHAAR_OTP,
                     "abhaId" to arguments?.getString("abha_id")
                 )
@@ -135,7 +122,9 @@ class SelectAuthenticationFragment :
                     bundle
                 )
             } else {
-                val bundle = bundleOf("verificationMode" to VerificationMode.CONFIRM_MOBILE_OTP,
+                val bundle = bundleOf(
+                    "authMethod" to viewModel.selectedAuthMethod ,
+                    "verificationMode" to VerificationMode.CONFIRM_MOBILE_OTP,
                     "abhaId" to arguments?.getString("abha_id")
                 )
                 findNavController().navigate(

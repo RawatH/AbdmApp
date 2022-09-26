@@ -1,6 +1,7 @@
 package org.commcare.dalvik.data.network
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -39,7 +40,8 @@ fun <T> safeApiCall(call: suspend () -> Response<T>) = flow {
                 }
                 422->{
                     it.errorBody()?.string()?.let{
-                        val adbmError:AbdmErrorModel =  Gson().fromJson(it, AbdmErrorModel::class.java)
+                        val gson = GsonBuilder().serializeNulls().create()
+                        val adbmError:AbdmErrorModel = gson.fromJson(it, AbdmErrorModel::class.java)
                         emit(HqResponseModel.AbdmError(500 , adbmError))
                     }
 

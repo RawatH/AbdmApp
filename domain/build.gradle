@@ -26,4 +26,6 @@ dependencies {
     api "com.google.dagger:hilt-android:$HILT_VERSION"
     api "androidx.datastore:datastore-preferences:1.0.0"
     api "androidx.lifecycle:lifecycle-livedata-ktx:$ANDROID_X_LIFE_CYCLE_VERSION"
+    api "com.jakewharton.timber:timber:$TIMBER_VER"
+
 }

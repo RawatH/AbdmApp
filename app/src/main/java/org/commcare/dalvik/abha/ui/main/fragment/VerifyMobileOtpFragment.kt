@@ -14,8 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
+import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
-import org.commcare.dalvik.abha.ui.main.custom.ProgressState
+import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
@@ -25,6 +26,8 @@ import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.AbhaDetailModel
 import org.commcare.dalvik.domain.model.AbhaVerificationResultModel
+import org.commcare.dalvik.domain.model.OtpResponseModel
+import timber.log.Timber
 
 @AndroidEntryPoint
 class VerifyMobileOtpFragment :
@@ -46,14 +49,42 @@ class VerifyMobileOtpFragment :
             }
         }
 
-        viewModel.requestMobileOtp()
+        /**
+         * Request for OTP
+         */
+        arguments?.getSerializable("verificationMode")?.let {
+            it as VerificationMode
+            when (it){
+                VerificationMode.VERIFY_MOBILE_OTP ->{
+                    requestMobileOtp()
+                }
+                VerificationMode.CONFIRM_MOBILE_OTP ->{
+                    requestMobileAuthOtp()
+                }
 
+            }
+        }
+
+    }
+
+
+    private fun requestMobileOtp(){
+        viewModel.requestMobileOtp()
+    }
+
+    private fun requestMobileAuthOtp(){
+        arguments?.getString("abhaId")?.let { healthId ->
+            viewModel.selectedAuthMethod?.let {
+                viewModel.getAuthOtp(healthId, it)
+            }
+        }
     }
 
     private fun observeUiState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
+                    Timber.d("EMIT Received -> ${it}")
                     when (it) {
                         GenerateAbhaUiState.InvalidState -> {
 
@@ -63,8 +94,27 @@ class VerifyMobileOtpFragment :
                             binding.resentOtp.isEnabled = false
                         }
 
+                        GenerateAbhaUiState.AuthOtpRequested ->{
+                            Timber.d("--------- OTP REQUESTED -----------")
+                            binding.resentOtp.isEnabled = false
+                            binding.verifyOtp.isEnabled = false
+                            binding.mobileOtpEt.setText("")
+                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(true))
+                        }
+
+                        /**
+                         * SUCCESS
+                         */
                         is GenerateAbhaUiState.Success -> {
                             when (it.requestType) {
+                                RequestType.GENERATE_AUTH_OTP -> {
+                                    val otResponseModel =
+                                        Gson().fromJson(it.data, OtpResponseModel::class.java)
+                                    viewModel.abhaRequestModel.setValue(AbhaNumberRequestModel(""))
+                                    viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
+                                    binding.timeProgress.startTimer()
+                                }
+
                                 RequestType.CONFIRM_AUTH_MOBILE_OTP -> {
                                     val abhaVerificationResultModel = Gson().fromJson(
                                         it.data,
@@ -76,9 +126,11 @@ class VerifyMobileOtpFragment :
                                     val bundle = bundleOf("resultModel" to abhaVerificationResultModel)
                                     navigateToNextScreen(RequestType.CONFIRM_AUTH_MOBILE_OTP,bundle)
                                 }
-                                RequestType.MOBILE_OTP_RESEND -> {
+
+                                RequestType.MOBILE_OTP -> {
 
                                 }
+
                                 RequestType.MOBILE_OTP_VERIFY -> {
                                     val abhaDetailModel =
                                         Gson().fromJson(it.data, AbhaDetailModel::class.java)
@@ -90,9 +142,12 @@ class VerifyMobileOtpFragment :
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 
+                        /**
+                         * ERROR
+                         */
                         is GenerateAbhaUiState.Error -> {
                             when (it.requestType) {
-                                RequestType.MOBILE_OTP_RESEND -> {
+                                RequestType.MOBILE_OTP -> {
                                     binding.verifyOtp.isEnabled =
                                         binding.mobileOtpEt.text?.isNotEmpty() ?: false
                                     binding.timeProgress.startTimer()
@@ -111,12 +166,12 @@ class VerifyMobileOtpFragment :
 
     private fun observeOtpTimer() {
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.timeProgress.timestate.collect {
+            binding.timeProgress.timeState.collect {
                 when (it) {
-                    ProgressState.TimeoutStarted -> {
+                    OtpTimerState.TimerStarted -> {
                         binding.resentOtp.isEnabled = false
                     }
-                    ProgressState.TimeoutOver -> {
+                    OtpTimerState.TimerOver -> {
                         binding.resentOtp.isEnabled = true
                         viewModel.getData(PrefKeys.OTP_BLOCKED_TS.getKey())
                     }
