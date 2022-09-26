@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/enterAbhaCreationDetailsFragment"
         android:name="org.commcare.dalvik.abha.ui.main.fragment.EnterAadhaarNumberFragment"
-        android:label="@string/abha_creation" >
+        >
         <action
             android:id="@+id/action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment"
             app:destination="@id/verifyAadhaarOtpFragment" />
@@ -15,7 +15,7 @@
     <fragment
         android:id="@+id/verifyMobileOtpFragment"
         android:name="org.commcare.dalvik.abha.ui.main.fragment.VerifyMobileOtpFragment"
-        android:label="@string/abha_creation" >
+       >
         <action
             android:id="@+id/action_verifyMobileOtpFragment_to_abhaDetailFragment"
             app:destination="@id/abhaDetailFragment" />
@@ -23,7 +23,7 @@
     <fragment
         android:id="@+id/verifyAadhaarOtpFragment"
         android:name="org.commcare.dalvik.abha.ui.main.fragment.VerifyAadhaarOtpFragment"
-        android:label="@string/abha_creation" >
+       >
         <action
             android:id="@+id/action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment"
             app:destination="@id/verifyMobileOtpFragment" />
@@ -31,5 +31,5 @@
     <fragment
         android:id="@+id/abhaDetailFragment"
         android:name="org.commcare.dalvik.abha.ui.main.fragment.AbhaCreationResultFragment"
-        android:label="@string/abha_creation" />
+         />
 </navigation>

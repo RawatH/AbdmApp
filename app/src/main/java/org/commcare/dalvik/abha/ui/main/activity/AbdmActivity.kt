@@ -2,14 +2,15 @@ package org.commcare.dalvik.abha.ui.main.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.google.gson.annotations.SerializedName
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,7 +23,8 @@ import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.data.network.HeaderInterceptor
 import org.commcare.dalvik.data.util.PrefKeys
-
+import org.commcare.dalvik.domain.model.LanguageManager
+import org.commcare.dalvik.domain.model.TranslationKey
 import timber.log.Timber
 import java.io.Serializable
 
@@ -35,8 +37,16 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        verifyIntentData()
         mBinding?.apply {
             setSupportActionBar(this.toolbarContainer.toolbar)
+            intent.extras?.containsKey("abha_id")?.let { hasAbhaId ->
+                if(hasAbhaId){
+                    supportActionBar?.title = LanguageManager.getTranslatedValue(TranslationKey.ABHA_VERIFICATION)
+                }else{
+                    supportActionBar?.title = LanguageManager.getTranslatedValue(TranslationKey.ABHA_CREATION)
+                }
+            }
         }
 
         navHostFragment =
@@ -56,6 +66,19 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     }
 
+    private fun verifyIntentData(){
+        intent.extras?.containsKey("abdm_api_token")?.let {  tokenPresent ->
+            if(!tokenPresent){
+                dispatchResult(getErrorIntent("API token missing"))
+            }
+        }
+
+        if( intent.extras?.containsKey("mobile_number") == false && intent.extras?.containsKey("abha_id") ==false){
+            dispatchResult(getErrorIntent("Missing Mobile number / ABHA ID"))
+        }
+
+    }
+
     private fun checkForBlockScenario() {
         lifecycleScope.launch(Dispatchers.Main) {
             viewmodel.checkIfBlocked().collect { ts ->
@@ -66,7 +89,8 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
                         val minutesLeft = (timeLeft / 1000) / 60
                         val secondsLeft = (timeLeft / 1000) % 60
                         val timeLeftStr = minutesLeft.toString() + "min : ${secondsLeft}sec"
-                        DialogUtility.showDialog(this@AbdmActivity,
+                        DialogUtility.showDialog(
+                            this@AbdmActivity,
                             resources.getString(R.string.app_blocked, timeLeftStr),
                             { dispatchResult(Intent()) }, DialogType.Blocking
                         )
@@ -105,7 +129,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
                     Timber.d("EMISSION -> ${it}")
                     when (it) {
                         is GenerateAbhaUiState.Loading -> {
-                            Timber.d( "LOADER VISIBILITY ${it.isLoading}")
+                            Timber.d("LOADER VISIBILITY ${it.isLoading}")
                             binding.loader.visibility =
                                 if (it.isLoading) View.VISIBLE else View.GONE
                         }
@@ -124,8 +148,11 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     private fun inflateNavGraph() {
         val bundle = intent.extras ?: bundleOf()
 
+        bundle.getString("abdm_api_token")?.let {
+            HeaderInterceptor.API_KEY = it
+        }
 
-        HeaderInterceptor.API_KEY = bundle.getString("abdm_api_token", "11")
+
 
         intent.putExtras(bundle)
         val inflater = navController.navInflater
@@ -138,7 +165,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         navController.setGraph(graph, bundle)
     }
 
-    fun onAbhaNumberReceived(intent:Intent) {
+    fun onAbhaNumberReceived(intent: Intent) {
         dispatchResult(intent)
     }
 
@@ -155,12 +182,17 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         finish()
     }
 
+    private fun getErrorIntent(msg:String) = Intent().apply {
+        putExtra("verified","failure")
+        putExtra("response_status",msg)
+    }
+
 }
 
 /**
  * Mode of Verification
  */
-enum class VerificationMode :Serializable {
+enum class VerificationMode : Serializable {
     VERIFY_MOBILE_OTP,
     VERIFY_AADHAAR_OTP,
     CONFIRM_MOBILE_OTP,

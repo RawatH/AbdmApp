@@ -113,6 +113,7 @@ class VerifyAadhaarOtpFragment :
                                  * OTP REQUEST
                                  */
                                 RequestType.AADHAAR_OTP -> {
+                                    binding.aadhaarOtpEt.requestFocus()
                                     binding.aadhaarOtpEt.isEnabled = true
                                     binding.timeProgress.startTimer()
                                     val otResponseModel =
@@ -121,6 +122,7 @@ class VerifyAadhaarOtpFragment :
 
                                 }
                                 RequestType.GENERATE_AUTH_OTP -> {
+                                    binding.aadhaarOtpEt.requestFocus()
                                     val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
                                     viewModel.abhaRequestModel.setValue(AbhaNumberRequestModel(""))

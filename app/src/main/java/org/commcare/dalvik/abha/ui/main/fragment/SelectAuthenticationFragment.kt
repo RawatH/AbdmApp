@@ -1,9 +1,14 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -69,7 +74,12 @@ class SelectAuthenticationFragment :
                                     (binding.authSelection as? MaterialAutoCompleteTextView)?.apply {
                                         setAdapter(adapter)
                                         setOnItemClickListener(this@SelectAuthenticationFragment)
+                                        if(authList.size == 1){
+                                            setText(adapter.getItem(0).toString(),false)
+                                        }
                                     }
+
+
                                 }
                             }
 

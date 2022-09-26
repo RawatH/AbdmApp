@@ -47,7 +47,9 @@ class GenerateAbhaViewModel @Inject constructor(
     fun init(mobileNumber: String) {
         abhaRequestModel.setValue(AbhaNumberRequestModel(mobileNumber))
         //TODO : Remove this for testing only
-        abhaRequestModel.value?.aadhaar = "232755042430"
+        abhaRequestModel.value?.aadhaar =
+//            "565141729442"
+    "232755042430"
     }
 
     fun resetUiState() {
@@ -481,6 +483,15 @@ class GenerateAbhaViewModel @Inject constructor(
      */
     private fun incOtpFailureCount() {
         otpFailureCount.value = otpFailureCount.value!!.inc()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        reset()
+    }
+
+    fun reset(){
+
     }
 
 }

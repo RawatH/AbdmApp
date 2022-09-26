@@ -6,16 +6,14 @@
 
     <fragment
         android:id="@+id/startAbhaVerificationFragment"
-        android:name="org.commcare.dalvik.abha.ui.main.fragment.StartAbhaVerificationFragment"
-        android:label="@string/abha_verification" >
+        android:name="org.commcare.dalvik.abha.ui.main.fragment.StartAbhaVerificationFragment">
         <action
             android:id="@+id/action_startAbhaVerificationFragment_to_selectAuthenticationFragment"
             app:destination="@id/selectAuthenticationFragment" />
     </fragment>
     <fragment
         android:id="@+id/selectAuthenticationFragment"
-        android:name="org.commcare.dalvik.abha.ui.main.fragment.SelectAuthenticationFragment"
-        android:label="@string/abha_verification" >
+        android:name="org.commcare.dalvik.abha.ui.main.fragment.SelectAuthenticationFragment">
         <action
             android:id="@+id/action_selectAuthenticationFragment_to_verifyMobileOtpFragment"
             app:destination="@id/verifyMobileOtpFragment" />
@@ -25,22 +23,19 @@
     </fragment>
     <fragment
         android:id="@+id/verifyMobileOtpFragment"
-        android:name="org.commcare.dalvik.abha.ui.main.fragment.VerifyMobileOtpFragment"
-        android:label="@string/abha_verification" >
+        android:name="org.commcare.dalvik.abha.ui.main.fragment.VerifyMobileOtpFragment">
         <action
             android:id="@+id/action_verifyMobileOtpFragment_to_abhaVerificationResultFragment"
             app:destination="@id/abhaVerificationResultFragment" />
     </fragment>
     <fragment
         android:id="@+id/verifyAadhaarOtpFragment"
-        android:name="org.commcare.dalvik.abha.ui.main.fragment.VerifyAadhaarOtpFragment"
-        android:label="@string/abha_verification" >
+        android:name="org.commcare.dalvik.abha.ui.main.fragment.VerifyAadhaarOtpFragment">
         <action
             android:id="@+id/action_verifyAadhaarOtpFragment_to_abhaVerificationResultFragment"
             app:destination="@id/abhaVerificationResultFragment" />
     </fragment>
     <fragment
         android:id="@+id/abhaVerificationResultFragment"
-        android:name="org.commcare.dalvik.abha.ui.main.fragment.AbhaVerificationResultFragment"
-        android:label="@string/abha_verification" />
+        android:name="org.commcare.dalvik.abha.ui.main.fragment.AbhaVerificationResultFragment" />
 </navigation>
