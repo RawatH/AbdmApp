@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data class="VerifyAadhaarOtpBinding">
-        <import type="org.commcare.dalvik.domain.model.TranslationKey"/>
+
+        <import type="org.commcare.dalvik.domain.model.TranslationKey" />
+
         <variable
             name="model"
             type="org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel" />
 
         <variable
             name="clickHandler"
-            type="org.commcare.dalvik.abha.ui.main.fragment.VerifyAadhaarOtpFragment"/>
+            type="org.commcare.dalvik.abha.ui.main.fragment.VerifyAadhaarOtpFragment" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,33 +27,20 @@
             android:layout_marginTop="16dp"
             app:endIconMode="clear_text"
             app:helperTextEnabled="true"
-            app:translatedTextKey="@{TranslationKey.ENTER_ADHR_OTP}"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:translatedTextKey="@{TranslationKey.ENTER_ADHR_OTP}">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/aadhaarOtpEt"
                 style="@style/EditTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:translatedTextKey="@{TranslationKey.ENTER_ADHR_OTP}"
-                android:inputType="number" />
+                android:inputType="number"
+                app:translatedTextKey="@{TranslationKey.ENTER_ADHR_OTP}" />
         </com.google.android.material.textfield.TextInputLayout>
-
-        <org.commcare.dalvik.abha.ui.main.custom.TimeProgressBar
-            android:id="@+id/timeProgress"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginBottom="2dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/resentOtp"
-            app:layout_constraintEnd_toEndOf="@+id/resentOtp"
-            app:layout_constraintTop_toTopOf="@+id/resentOtp" />
 
 
         <androidx.constraintlayout.widget.Guideline
@@ -68,30 +57,59 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="@dimen/_16dp" />
 
-        <Button
-            android:id="@+id/resentOtp"
-            style="@style/RoundStyleButton"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/resentOtpContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:onClickListener="@{clickHandler}"
-            app:translatedTextKey="@{TranslationKey.RESEND_OTP}"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toBottomOf="@+id/otpInputLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/otpInputLayout">
+
+            <Button
+                android:id="@+id/resentOtp"
+                style="@style/RoundStyleButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:onClickListener="@{clickHandler}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/timeProgress"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:translatedTextKey="@{TranslationKey.RESEND_OTP}"
+                tools:text="Resend" />
+
+            <org.commcare.dalvik.abha.ui.main.custom.TimeProgressBar
+                android:id="@+id/timeProgress"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="2dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/resentOtp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/resentOtp"
+                app:layout_constraintTop_toTopOf="@+id/resentOtp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <Button
             android:id="@+id/verifyOtp"
             style="@style/RoundStyleButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:enabled="false"
             android:layout_marginTop="@dimen/_16dp"
+            android:enabled="false"
             android:onClickListener="@{clickHandler}"
-            app:translatedTextKey="@{TranslationKey.VERIFY}"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toBottomOf="@+id/resentOtp" />
+            app:layout_constraintTop_toBottomOf="@+id/resentOtpContainer"
+            app:translatedTextKey="@{TranslationKey.VERIFY}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -30,10 +30,9 @@ data class OtpRequestCallModel(
         }
     }
 
-    fun unblock() {
-        if(isBlocked()) {
-            counter = 0
-        }
+    fun reset() {
+        counter = 0
+        blockedTS = System.currentTimeMillis()
     }
 
     fun getTimeLeftToUnblock(): String {

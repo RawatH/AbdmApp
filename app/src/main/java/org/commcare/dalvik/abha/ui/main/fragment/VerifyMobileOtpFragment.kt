@@ -118,7 +118,6 @@ class VerifyMobileOtpFragment :
                 viewModel.uiState.collect {
                     Timber.d("EMIT Received Mobile-> ${it}")
                     when (it) {
-
                         GenerateAbhaUiState.MobileOtpRequested,
                         GenerateAbhaUiState.AuthOtpRequested -> {
                             Timber.d("--------- OTP REQUESTED -----------")
@@ -151,11 +150,19 @@ class VerifyMobileOtpFragment :
                                     val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
                                     viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
+                                    viewModel.abhaRequestModel.value?.abhaId?.let {abhaIdKey ->
+                                        viewModel.clearBlockState(abhaIdKey)
+                                    }
                                 }
 
                                 RequestType.MOBILE_OTP -> {
                                     binding.mobileOtpEt.isEnabled = true
                                     binding.timeProgress.startTimer()
+
+                                    viewModel.abhaRequestModel.value?.aadhaar?.let {aadhaarKey ->
+                                        viewModel.clearBlockState(aadhaarKey)
+                                    }
+
                                 }
 
                                 /**

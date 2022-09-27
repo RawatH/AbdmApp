@@ -32,12 +32,13 @@ class TestActivity : AppCompatActivity() {
 
     }
 
+    val lang = "en"
     fun startIntentA() {
         val intent = Intent(action).apply {
             putExtras(
                 bundleOf(
                     "abha_id" to "91766261606756",
-                    "lang_code" to "en"
+                    "lang_code" to lang
                 )
             )
         }
@@ -52,7 +53,7 @@ class TestActivity : AppCompatActivity() {
                 bundleOf(
                     "mobile_number" to "9560833229",
                     "abdm_api_token" to "1122333",
-                    "lang_code" to "en"
+                    "lang_code" to lang
                 )
             )
         }

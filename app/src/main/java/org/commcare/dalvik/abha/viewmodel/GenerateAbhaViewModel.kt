@@ -48,8 +48,6 @@ class GenerateAbhaViewModel @Inject constructor(
         }
     }
 
-//    fun checkIfBlocked() = saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey())
-
     fun validateData() {
         viewModelScope.launch {
             var isMobileNumberValid = false
@@ -425,8 +423,35 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Reset block state
      */
-    fun clearBlockState() {
-        saveDataUsecase.removeKey(PrefKeys.OTP_BLOCKED_TS.getKey())
+    fun clearBlockState(key:String) {
+        abhaRequestModel.value?.let {
+            viewModelScope.launch {
+                saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
+                    val savedJson: JsonObject
+                    val otpRequestModel:OtpRequestCallModel
+
+                    if (it != null) {
+                        savedJson = Gson().fromJson(it, JsonObject::class.java)
+
+                        if(savedJson.get(key) != null) {
+                            otpRequestModel = Gson().fromJson(
+                                savedJson.get(key).asString,
+                                OtpRequestCallModel::class.java
+                            )
+                            otpRequestModel.reset()
+                            savedJson.remove(key)
+                            savedJson.addProperty(key, Gson().toJson(otpRequestModel))
+                            Timber.d("----- OTP STATE  CLEARED ------ \n ${savedJson}")
+
+                            saveData(PrefKeys.OTP_REQUEST.getKey(), savedJson.toString())
+                        }
+                    }
+
+                    true
+                }
+
+            }
+        }
     }
 
     /**
@@ -456,10 +481,9 @@ class GenerateAbhaViewModel @Inject constructor(
     }
 
     /**
-     * Save OTP count request
+     * Save OTP CALL Request
      */
     private fun saveOtpRequestCallCount(key: String) {
-        //SAVE OTP CALL DATA
         abhaRequestModel.value?.let {
             viewModelScope.launch {
                 saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
@@ -553,7 +577,6 @@ sealed class OtpCallState {
  */
 sealed class GenerateAbhaUiState {
     data class Loading(val isLoading: Boolean) : GenerateAbhaUiState()
-
     object TranslationReceived : GenerateAbhaUiState()
     object ValidState : GenerateAbhaUiState()
     object InvalidState : GenerateAbhaUiState()

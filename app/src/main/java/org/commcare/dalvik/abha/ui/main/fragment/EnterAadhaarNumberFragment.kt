@@ -74,11 +74,11 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
-                    Timber.d("=======EMIT ${it.toString()}")
+                    Timber.d("=======> EMIT ${it.toString()}")
                     when (it) {
                         is GenerateAbhaUiState.Loading -> {
-                            binding.generateOtp.isEnabled = !it.isLoading
-                            binding.aadharNumberEt.isEnabled = it.isLoading
+//                            binding.generateOtp.isEnabled = !it.isLoading
+//                            binding.aadharNumberEt.isEnabled = it.isLoading
                         }
                         is GenerateAbhaUiState.InvalidState -> {
                             binding.generateOtp.isEnabled = false
@@ -92,8 +92,8 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                             Handler(Looper.getMainLooper()).post {
                                 binding.invalidateAll()
                             }
-
                         }
+
                         is GenerateAbhaUiState.Error -> {
                             Timber.d("XXXXXXXX" + it.data)
                             binding.generateOtp.isEnabled = true

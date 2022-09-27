@@ -26,6 +26,7 @@ class SelectAuthenticationFragment :
     AdapterView.OnItemClickListener {
 
     private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    val filter = listOf("AADHAAR_OTP", "MOBILE_OTP")
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,7 +52,6 @@ class SelectAuthenticationFragment :
                         is GenerateAbhaUiState.Success -> {
                             when (it.requestType) {
                                 RequestType.AUTH_METHODS -> {
-                                    val filter = listOf("AADHAAR_OTP", "MOBILE_OTP")
                                     val authList = mutableListOf<String>()
                                     it.data.getAsJsonArray("auth_methods")
                                         .forEach {
@@ -105,7 +105,9 @@ class SelectAuthenticationFragment :
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         parent?.getItemAtPosition(position).toString().let {
-            viewModel.selectedAuthMethod = it
+            viewModel.selectedAuthMethod = if (it.lowercase().contains("mobile")) {
+                filter[1]
+            } else filter[0]
             binding.startVerfication.isEnabled = true
         }
     }
