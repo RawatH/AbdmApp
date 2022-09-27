@@ -13,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.AbdmActivityBinding
@@ -22,7 +23,6 @@ import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.data.network.HeaderInterceptor
-import org.commcare.dalvik.data.util.PrefKeys
 import org.commcare.dalvik.domain.model.LanguageManager
 import org.commcare.dalvik.domain.model.TranslationKey
 import timber.log.Timber
@@ -41,10 +41,12 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         mBinding?.apply {
             setSupportActionBar(this.toolbarContainer.toolbar)
             intent.extras?.containsKey("abha_id")?.let { hasAbhaId ->
-                if(hasAbhaId){
-                    supportActionBar?.title = LanguageManager.getTranslatedValue(TranslationKey.ABHA_VERIFICATION)
-                }else{
-                    supportActionBar?.title = LanguageManager.getTranslatedValue(TranslationKey.ABHA_CREATION)
+                if (hasAbhaId) {
+                    supportActionBar?.title =
+                        LanguageManager.getTranslatedValue(TranslationKey.ABHA_VERIFICATION)
+                } else {
+                    supportActionBar?.title =
+                        LanguageManager.getTranslatedValue(TranslationKey.ABHA_CREATION)
                 }
             }
         }
@@ -57,8 +59,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
         observeLoader()
-        observeOtpFailure()
-//        checkForBlockScenario()
+        observerOtpBlock()
 
         intent.extras?.getString("lang_code")?.let {
             viewmodel.getTranslation(it)
@@ -66,14 +67,27 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     }
 
-    private fun verifyIntentData(){
-        intent.extras?.containsKey("abdm_api_token")?.let {  tokenPresent ->
-            if(!tokenPresent){
+    private fun observerOtpBlock(){
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewmodel.otpRequestBlocked.asFlow().collect { isOtpBlocked ->
+                if (isOtpBlocked) {
+                    DialogUtility.showDialog(
+                        this@AbdmActivity,
+                       "Blocked",
+                        { dispatchResult(getBlockedIntent("Blocked ,multiple OTP requested.")) }, DialogType.Blocking
+                    )
+                }
+            }
+        }
+    }
+    private fun verifyIntentData() {
+        intent.extras?.containsKey("abdm_api_token")?.let { tokenPresent ->
+            if (!tokenPresent) {
                 dispatchResult(getErrorIntent("API token missing"))
             }
         }
 
-        if( intent.extras?.containsKey("mobile_number") == false && intent.extras?.containsKey("abha_id") ==false){
+        if (intent.extras?.containsKey("mobile_number") == false && intent.extras?.containsKey("abha_id") == false) {
             dispatchResult(getErrorIntent("Missing Mobile number / ABHA ID"))
         }
 
@@ -99,24 +113,6 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
                     }
                 }
 
-            }
-        }
-    }
-
-    /**
-     * OTP failure check
-     */
-    private fun observeOtpFailure() {
-        lifecycleScope.launch {
-            viewmodel.otpFailureCount.asFlow().collect { otpFailCount ->
-                if (otpFailCount == 4) {
-                    viewmodel.saveDataUsecase.executeSave(
-                        System.currentTimeMillis().toString(),
-                        PrefKeys.OTP_BLOCKED_TS.getKey()
-                    )
-                    viewmodel.otpFailureCount.value = 0
-                    DialogUtility.showDialog(this@AbdmActivity, "Too many OTP attempts.")
-                }
             }
         }
     }
@@ -182,9 +178,14 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         finish()
     }
 
-    private fun getErrorIntent(msg:String) = Intent().apply {
-        putExtra("verified","failure")
-        putExtra("response_status",msg)
+    private fun getErrorIntent(msg: String) = Intent().apply {
+        putExtra("verified", "failure")
+        putExtra("response_status", msg)
+    }
+
+    private fun getBlockedIntent(msg: String) = Intent().apply {
+        putExtra("verified", "failure")
+        putExtra("response_status", msg)
     }
 
 }

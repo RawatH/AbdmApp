@@ -40,6 +40,11 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         binding.clickHandler = this
         attachUiStateObserver()
         populateIntentData()
+        checkForBlockedState()
+    }
+
+    private fun checkForBlockedState(){
+
     }
 
     private fun populateIntentData() {

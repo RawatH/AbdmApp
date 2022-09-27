@@ -31,22 +31,21 @@ class GenerateAbhaViewModel @Inject constructor(
     private val confirmAadhaarOtpUsecase: ConfirmAadhaarOtpUsecase,
     private val confirmMobileOtpUsecase: ConfirmMobileOtpUsecase
 ) : BaseViewModel() {
-
-    var otpFailureCount = MutableLiveData(0)
     var selectedAuthMethod: String? = null
     var abhaRequestModel: PropMutableLiveData<AbhaRequestModel> = PropMutableLiveData()
     val abhaDetailModel: MutableLiveData<AbhaDetailModel> = MutableLiveData()
-
     val uiState = MutableStateFlow<GenerateAbhaUiState>(GenerateAbhaUiState.InvalidState)
+    val otpRequestBlocked: MutableLiveData<Boolean> = MutableLiveData()
 
-    fun init (reqModel: AbhaRequestModel){
+    val otpCallState = MutableStateFlow<OtpCallState>(OtpCallState.None)
+
+    fun init(reqModel: AbhaRequestModel) {
         abhaRequestModel.setValue(reqModel)
     }
 
     fun resetUiState() {
         viewModelScope.launch {
             uiState.emit(GenerateAbhaUiState.Loading(false))
-//            uiState.emit(GenerateAbhaUiState.InvalidState)
         }
     }
 
@@ -75,59 +74,55 @@ class GenerateAbhaViewModel @Inject constructor(
         }
     }
 
-    //---------------------   REQUEST  OTP
+    //--------------------- REQUEST_OTP
     /**
      * Req AadhaarOtp
      */
     fun requestAadhaarOtp() {
         viewModelScope.launch {
-            val aadhaarOtpResponse = async {
+            //save otp req call count
+            abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                saveOtpRequestCallCount(aadhaarKey)
+            }
 
-                //save otp req call count
-                abhaRequestModel.value?.aadhaar?.let {
-                    saveOtpRequestCallCount(it)
-                }
-
-                val aadhaarOtpFlow = reqAadhaarOtpUsecase.execute(abhaRequestModel.value!!.aadhaar)
-                aadhaarOtpFlow.collect {
-                    when (it) {
-                        is HqResponseModel.Loading -> {
-                            Timber.d("EMIT Sending -> GenerateAbhaUiState.AadhaarOtpRequested")
-                            uiState.emit(GenerateAbhaUiState.AadhaarOtpRequested)
-                        }
-                        is HqResponseModel.Success -> {
-                            Timber.d("EMIT Sending -> GenerateAbhaUiState.Success")
-                            uiState.emit(
-                                GenerateAbhaUiState.Success(
-                                    it.value,
-                                    RequestType.AADHAAR_OTP
-                                )
+            val aadhaarOtpFlow = reqAadhaarOtpUsecase.execute(abhaRequestModel.value!!.aadhaar)
+            aadhaarOtpFlow.collect {
+                when (it) {
+                    is HqResponseModel.Loading -> {
+                        Timber.d("EMIT Sending -> GenerateAbhaUiState.AadhaarOtpRequested")
+                        uiState.emit(GenerateAbhaUiState.AadhaarOtpRequested)
+                    }
+                    is HqResponseModel.Success -> {
+                        Timber.d("EMIT Sending -> GenerateAbhaUiState.Success")
+                        uiState.emit(
+                            GenerateAbhaUiState.Success(
+                                it.value,
+                                RequestType.AADHAAR_OTP
                             )
-                        }
-                        is HqResponseModel.Error -> {
-                            Timber.d("EMIT Sending -> GenerateAbhaUiState.Error")
-                            uiState.emit(
-                                GenerateAbhaUiState.Error(
-                                    it.value,
-                                    RequestType.AADHAAR_OTP
-                                )
+                        )
+                    }
+                    is HqResponseModel.Error -> {
+                        Timber.d("EMIT Sending -> GenerateAbhaUiState.Error")
+                        uiState.emit(
+                            GenerateAbhaUiState.Error(
+                                it.value,
+                                RequestType.AADHAAR_OTP
                             )
-                        }
-                        is HqResponseModel.AbdmError -> {
-                            Timber.d("EMIT Sending -> GenerateAbhaUiState.AbdmError")
-                            uiState.emit(
-                                GenerateAbhaUiState.AbdmError(
-                                    it.value,
-                                    RequestType.AADHAAR_OTP
-                                )
+                        )
+                    }
+                    is HqResponseModel.AbdmError -> {
+                        Timber.d("EMIT Sending -> GenerateAbhaUiState.AbdmError")
+                        uiState.emit(
+                            GenerateAbhaUiState.AbdmError(
+                                it.value,
+                                RequestType.AADHAAR_OTP
                             )
-                        }
+                        )
                     }
                 }
             }
-
-            aadhaarOtpResponse.await()
         }
+
     }
 
     /**
@@ -152,6 +147,11 @@ class GenerateAbhaViewModel @Inject constructor(
                     }
 
                     is HqResponseModel.Success -> {
+                        //save otp req call count
+                        abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                            saveOtpRequestCallCount(aadhaarKey)
+                        }
+
                         uiState.emit(
                             GenerateAbhaUiState.Success(
                                 it.value,
@@ -179,11 +179,10 @@ class GenerateAbhaViewModel @Inject constructor(
      */
     fun getAuthOtp(healthId: String, authMethod: String) {
         viewModelScope.launch {
-
             //save otp req call count
-//            abhaRequestModel.value?.?.let {
-//                saveOtpRequestCallCount(it)
-//            }
+            abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+                saveOtpRequestCallCount(abhaIdKey)
+            }
 
             generateAuthOtpUsecase.execute(healthId, authMethod).collect {
                 when (it) {
@@ -458,30 +457,81 @@ class GenerateAbhaViewModel @Inject constructor(
     }
 
     /**
-     * Save data in data store
+     * Save OTP count request
      */
     private fun saveOtpRequestCallCount(key: String) {
         //SAVE OTP CALL DATA
-        abhaRequestModel?.value?.let {
+        abhaRequestModel.value?.let {
             viewModelScope.launch {
                 saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
-                    Timber.d("OTP TS : ${it}")
-                    val json: JsonObject
+                    val savedJson: JsonObject
+                    val otpRequestModel:OtpRequestCallModel
+
                     if (it != null) {
-                        json = Gson().fromJson(it, JsonObject::class.java)
-                        val counter = json.get(key).asString.toInt() + 1
-                        json.remove(key)
-                        json.addProperty(key, counter)
+                        savedJson = Gson().fromJson(it, JsonObject::class.java)
+                        otpRequestModel = Gson().fromJson(savedJson.get(key).asString , OtpRequestCallModel::class.java)
+                        otpRequestModel.increaseOtpCounter()
+                        savedJson.remove(key)
+                        savedJson.addProperty(key, Gson().toJson(otpRequestModel))
                     } else {
-                        val otpRequestModel =
-                            OtpRequestCallModel(key, 1)
-                        json = JsonObject()
-                        json.addProperty(otpRequestModel.id, otpRequestModel.counter)
+                        otpRequestModel = OtpRequestCallModel(key, 1)
+                        savedJson = JsonObject()
+                        savedJson.addProperty(otpRequestModel.id, Gson().toJson(otpRequestModel))
                     }
-                    saveData(PrefKeys.OTP_REQUEST.getKey(), json.toString())
+                    saveData(PrefKeys.OTP_REQUEST.getKey(), savedJson.toString())
+
+//                    if(otpRequestModel.isBlocked()){
+//                        otpCallState.emit(OtpCallState.OtpReqBlocked)
+//                    }else{
+//                        otpCallState.emit(OtpCallState.OtpReqAvailable)
+//                    }
                     true
                 }
 
+            }
+        }
+    }
+
+    /**
+     * Check if Aadhaar is blocked
+     */
+    suspend fun checkForBlock(key: String): Boolean {
+        var isBlocked = false
+        val job = viewModelScope.async {
+            saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
+                if (it != null) {
+                    val savedJson = Gson().fromJson(it, JsonObject::class.java)
+                    val otpRequestCallModel = Gson().fromJson(savedJson.get(key).asString , OtpRequestCallModel::class.java)
+                    isBlocked = otpRequestCallModel.isBlocked()
+                    if (otpRequestCallModel.isBlocked()) {
+                        otpRequestBlocked.value = true
+                    }
+                }
+                true
+            }
+        }
+        job.await()
+        return isBlocked
+    }
+
+    fun checkForBlock1(key: String) {
+        viewModelScope.launch {
+            saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
+
+                if (it != null) {
+                    val savedJson = Gson().fromJson(it, JsonObject::class.java)
+                    val otpRequestCallModel= Gson().fromJson(savedJson.get(key).asString , OtpRequestCallModel::class.java)
+
+                    if (otpRequestCallModel.isBlocked()) {
+                        otpRequestBlocked.value = true
+                        otpCallState.emit(OtpCallState.OtpReqBlocked)
+                    }else{
+                        otpCallState.emit(OtpCallState.OtpReqAvailable)
+                    }
+                }else{
+                    otpCallState.emit(OtpCallState.OtpReqAvailable)
+                }
+                true
             }
         }
     }
@@ -495,6 +545,16 @@ class GenerateAbhaViewModel @Inject constructor(
 
     }
 
+}
+
+/**
+ * OTP Call State
+ */
+
+sealed class OtpCallState {
+    object None : OtpCallState()
+    object OtpReqBlocked : OtpCallState()
+    object OtpReqAvailable : OtpCallState()
 }
 
 /**
