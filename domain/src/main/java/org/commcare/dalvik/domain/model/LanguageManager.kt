@@ -17,6 +17,7 @@ object LanguageManager {
             "    \"RESEND_OTP\": \"Resend OTP\",\n" +
             "    \"GEN_OTP\": \"Generate OTP\",\n" +
             "    \"ENTER_ADHR_OTP\": \"Enter Aadhaar OTP\",\n" +
+            "    \"ENTER_MOB_OTP\": \"Enter Mobile OTP\",\n" +
             "    \"BENF_MOB_NUM\": \"Beneficiary Mobile Number\",\n" +
             "    \"BENF_ADHR_NUM\": \"Beneficiary Aadhaar Number\",\n" +
             "    \"USE_ADHR_DATA_IN_COMMCARE\": \"Use Aadhaar data in Commcare\",\n" +
@@ -49,9 +50,9 @@ object LanguageManager {
             "    \"kycPhoto\": \"KYC Photo\",\n" +
             "    \"profilePhoto\": \"Profile Photo\",\n" +
             "    \"mobile\": \"Mobile Number\",\n" +
-            "    \"authMethods\": \"Authenication Methods\",\n" +
+            "    \"authMethods\": \"Authentication Methods\",\n" +
             "    \"pincode\": \"Pin Code\",\n" +
-            "    \"AADHAAR_OTP\": \"Aadhar Otp\",\n" +
+            "    \"AADHAAR_OTP\": \"Aadhaar Otp\",\n" +
             "    \"MOBILE_OTP\": \"Mobile Otp\"\n" +
             "  }\n" +
             "}"

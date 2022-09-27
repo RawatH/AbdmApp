@@ -71,6 +71,25 @@ class VerifyMobileOtpFragment :
     }
 
     /**
+     * Start Resend timer
+     */
+
+    private fun startResendTimer(key:String){
+        lifecycleScope.launch{
+            viewModel.checkForBlockedState(key).collect {
+                when (it) {
+                    OtpCallState.OtpReqAvailable -> {
+                        binding.timeProgress.startTimer()
+                    }
+                    is OtpCallState.OtpReqBlocked -> {
+                        viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Request Request MOBILE_OTP
      */
     private fun requestMobileOtp() {
@@ -118,18 +137,12 @@ class VerifyMobileOtpFragment :
                 viewModel.uiState.collect {
                     Timber.d("EMIT Received Mobile-> ${it}")
                     when (it) {
-                        GenerateAbhaUiState.MobileOtpRequested,
-                        GenerateAbhaUiState.AuthOtpRequested -> {
-                            Timber.d("--------- OTP REQUESTED -----------")
-                            binding.resentOtp.isEnabled = false
-                            binding.verifyOtp.isEnabled = false
-                            binding.mobileOtpEt.isEnabled = false
-                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(true))
-                        }
 
+                        GenerateAbhaUiState.MobileOtpRequested,
+                        GenerateAbhaUiState.AuthOtpRequested,
                         GenerateAbhaUiState.VerifyAuthOtpRequested,
                         GenerateAbhaUiState.VerifyMobileOtpRequested -> {
-                            Timber.d("--------- MOBILE OTP VERIFY REQUESTED -----------")
+                            Timber.d("--------- MOBILE OTP GEN / VERIFY REQUESTED -----------")
                             binding.mobileOtpEt.isEnabled = false
                             binding.resentOtp.isEnabled = false
                             binding.verifyOtp.isEnabled = false
@@ -206,11 +219,21 @@ class VerifyMobileOtpFragment :
                          */
                         is GenerateAbhaUiState.Error -> {
                             when (it.requestType) {
-                                RequestType.GENERATE_AUTH_OTP,
-                                RequestType.MOBILE_OTP -> {
-                                    binding.timeProgress.startTimer()
+                                RequestType.GENERATE_AUTH_OTP ->{
+                                    binding.mobileOtpEt.isEnabled = true
+                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+                                        startResendTimer(abhaIdKey)
+                                    }
                                 }
 
+                                RequestType.MOBILE_OTP -> {
+                                    binding.mobileOtpEt.isEnabled = true
+                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                                        startResendTimer(aadhaarKey)
+                                    }
+                                }
+
+                                RequestType.CONFIRM_AUTH_MOBILE_OTP,
                                 RequestType.MOBILE_OTP_VERIFY -> {
                                     binding.mobileOtpEt.isEnabled = false
                                     if (binding.timeProgress.timeState.value != OtpTimerState.TimerStarted) {
@@ -225,17 +248,25 @@ class VerifyMobileOtpFragment :
 
                         is GenerateAbhaUiState.AbdmError -> {
                             when (it.requestType) {
-                                RequestType.GENERATE_AUTH_OTP,
-                                RequestType.MOBILE_OTP -> {
-                                    binding.timeProgress.startTimer()
+                                RequestType.GENERATE_AUTH_OTP ->{
+                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+                                        startResendTimer(abhaIdKey)
+                                    }
                                 }
 
+                                RequestType.MOBILE_OTP -> {
+                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                                        startResendTimer(aadhaarKey)
+                                    }
+                                }
+
+                                RequestType.CONFIRM_AUTH_MOBILE_OTP,
                                 RequestType.MOBILE_OTP_VERIFY -> {
+                                    binding.mobileOtpEt.setText("")
                                     binding.mobileOtpEt.isEnabled = true
                                     if (binding.timeProgress.timeState.value != OtpTimerState.TimerStarted) {
                                         binding.resentOtp.isEnabled = true
                                     }
-                                    binding.mobileOtpEt.setText("")
                                 }
                             }
                             (activity as AbdmActivity).showBlockerDialog(it.data.getActualMessage())

@@ -166,6 +166,15 @@ class GenerateAbhaViewModel @Inject constructor(
                         )
                     }
 
+                    is HqResponseModel.AbdmError ->{
+                        uiState.emit(
+                            GenerateAbhaUiState.AbdmError(
+                                it.value,
+                                RequestType.MOBILE_OTP
+                            )
+                        )
+                    }
+
                 }
             }
         }
@@ -196,7 +205,12 @@ class GenerateAbhaViewModel @Inject constructor(
                         )
                     }
                     is HqResponseModel.Error -> {
-
+                        uiState.emit(
+                            GenerateAbhaUiState.Error(
+                                it.value,
+                                RequestType.GENERATE_AUTH_OTP
+                            )
+                        )
                     }
                     is HqResponseModel.AbdmError -> {
                         uiState.emit(
@@ -236,8 +250,12 @@ class GenerateAbhaViewModel @Inject constructor(
 
                     }
                     is HqResponseModel.Error -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(false))
-
+                        uiState.emit(
+                            GenerateAbhaUiState.Error(
+                                it.value,
+                                RequestType.MOBILE_OTP_VERIFY
+                            )
+                        )
                     }
                     is HqResponseModel.AbdmError -> {
                         uiState.emit(
@@ -275,7 +293,12 @@ class GenerateAbhaViewModel @Inject constructor(
 
                     }
                     is HqResponseModel.Error -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(false))
+                        uiState.emit(
+                            GenerateAbhaUiState.Error(
+                                it.value,
+                                RequestType.AADHAAR_OTP_VERIFY
+                            )
+                        )
                     }
                     is HqResponseModel.AbdmError -> {
                         uiState.emit(
@@ -301,7 +324,7 @@ class GenerateAbhaViewModel @Inject constructor(
             confirmAadhaarOtpUsecase.execute(verifyOOtpRequestModel).collect {
                 when (it) {
                     HqResponseModel.Loading -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(true))
+                        uiState.emit(GenerateAbhaUiState.VerifyAuthOtpRequested)
                     }
                     is HqResponseModel.Success -> {
                         uiState.emit(
@@ -322,7 +345,12 @@ class GenerateAbhaViewModel @Inject constructor(
                     }
 
                     is HqResponseModel.Error -> {
-
+                        uiState.emit(
+                            GenerateAbhaUiState.Error(
+                                it.value,
+                                RequestType.CONFIRM_AUTH_AADHAAR_OTP
+                            )
+                        )
                     }
                 }
 
@@ -360,7 +388,12 @@ class GenerateAbhaViewModel @Inject constructor(
                     }
 
                     is HqResponseModel.Error -> {
-                        uiState.emit(GenerateAbhaUiState.Loading(false))
+                        uiState.emit(
+                            GenerateAbhaUiState.Error(
+                                it.value,
+                                RequestType.CONFIRM_AUTH_MOBILE_OTP
+                            )
+                        )
                     }
                 }
             }
@@ -398,10 +431,20 @@ class GenerateAbhaViewModel @Inject constructor(
 
                     }
                     is HqResponseModel.Error -> {
-
+                        uiState.emit(
+                            GenerateAbhaUiState.Error(
+                                it.value,
+                                RequestType.AUTH_METHODS
+                            )
+                        )
                     }
                     is HqResponseModel.AbdmError -> {
-
+                        uiState.emit(
+                            GenerateAbhaUiState.AbdmError(
+                                it.value,
+                                RequestType.AUTH_METHODS
+                            )
+                        )
                     }
                 }
             }
