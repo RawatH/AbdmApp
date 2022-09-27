@@ -231,7 +231,7 @@ class VerifyMobileOtpFragment :
                                 }
 
                                 RequestType.MOBILE_OTP_VERIFY -> {
-                                    binding.mobileOtpEt.isEnabled = false
+                                    binding.mobileOtpEt.isEnabled = true
                                     if (binding.timeProgress.timeState.value != OtpTimerState.TimerStarted) {
                                         binding.resentOtp.isEnabled = true
                                     }

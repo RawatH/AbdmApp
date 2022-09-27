@@ -39,6 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
+                android:maxLength="6"
                 app:translatedTextKey="@{TranslationKey.ENTER_ADHR_OTP}" />
         </com.google.android.material.textfield.TextInputLayout>
 

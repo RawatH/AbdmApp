@@ -176,7 +176,7 @@ class GenerateAbhaViewModel @Inject constructor(
      */
     fun getAuthOtp(healthId: String, authMethod: String) {
         viewModelScope.launch {
-           //save otp req call count
+            //save otp req call count
             abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
                 saveOtpRequestCallCount(abhaIdKey)
             }
@@ -240,9 +240,11 @@ class GenerateAbhaViewModel @Inject constructor(
 
                     }
                     is HqResponseModel.AbdmError -> {
-                        GenerateAbhaUiState.AbdmError(
-                            it.value,
-                            RequestType.MOBILE_OTP_VERIFY
+                        uiState.emit(
+                            GenerateAbhaUiState.AbdmError(
+                                it.value,
+                                RequestType.MOBILE_OTP_VERIFY
+                            )
                         )
                     }
 
@@ -423,17 +425,17 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Reset block state
      */
-    fun clearBlockState(key:String) {
+    fun clearBlockState(key: String) {
         abhaRequestModel.value?.let {
             viewModelScope.launch {
                 saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
                     val savedJson: JsonObject
-                    val otpRequestModel:OtpRequestCallModel
+                    val otpRequestModel: OtpRequestCallModel
 
                     if (it != null) {
                         savedJson = Gson().fromJson(it, JsonObject::class.java)
 
-                        if(savedJson.get(key) != null) {
+                        if (savedJson.get(key) != null) {
                             otpRequestModel = Gson().fromJson(
                                 savedJson.get(key).asString,
                                 OtpRequestCallModel::class.java
@@ -488,12 +490,12 @@ class GenerateAbhaViewModel @Inject constructor(
             viewModelScope.launch {
                 saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
                     val savedJson: JsonObject
-                    val otpRequestModel:OtpRequestCallModel
+                    val otpRequestModel: OtpRequestCallModel
 
                     if (it != null) {
                         savedJson = Gson().fromJson(it, JsonObject::class.java)
 
-                        if(savedJson.get(key) != null) {
+                        if (savedJson.get(key) != null) {
                             otpRequestModel = Gson().fromJson(
                                 savedJson.get(key).asString,
                                 OtpRequestCallModel::class.java
@@ -501,9 +503,12 @@ class GenerateAbhaViewModel @Inject constructor(
                             otpRequestModel.increaseOtpCounter()
                             savedJson.remove(key)
                             savedJson.addProperty(key, Gson().toJson(otpRequestModel))
-                        }else{
+                        } else {
                             otpRequestModel = OtpRequestCallModel(key, 1)
-                            savedJson.addProperty(otpRequestModel.id, Gson().toJson(otpRequestModel))
+                            savedJson.addProperty(
+                                otpRequestModel.id,
+                                Gson().toJson(otpRequestModel)
+                            )
                         }
                     } else {
                         otpRequestModel = OtpRequestCallModel(key, 1)
@@ -528,7 +533,7 @@ class GenerateAbhaViewModel @Inject constructor(
         saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
             if (it != null) {
                 val savedJson = Gson().fromJson(it, JsonObject::class.java)
-                if(savedJson.has(key)) {
+                if (savedJson.has(key)) {
                     val otpRequestCallModel = Gson().fromJson(
                         savedJson.get(key).asString,
                         OtpRequestCallModel::class.java
@@ -542,10 +547,10 @@ class GenerateAbhaViewModel @Inject constructor(
                         emit(OtpCallState.OtpReqAvailable)
                     }
 
-                }else{
+                } else {
                     emit(OtpCallState.OtpReqAvailable)
                 }
-            }else{
+            } else {
                 emit(OtpCallState.OtpReqAvailable)
             }
             true

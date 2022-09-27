@@ -3,12 +3,11 @@ package org.commcare.dalvik.data.network
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.commcare.dalvik.domain.model.AbdmErrorModel
 import org.commcare.dalvik.domain.model.HqResponseModel
-import org.commcare.dalvik.domain.model.OtpResponseModel
 import retrofit2.Response
+import timber.log.Timber
 
 class NetworkUtil {
     companion object {
@@ -25,6 +24,7 @@ fun <T> safeApiCall(call: suspend () -> Response<T>) = flow {
         val response = call.invoke()
         response.let {
             var responseJsonObject:JsonObject
+            Timber.d("Network : ===> Response Received : code = ${response.code()}")
             when(response.code()){
                 200 ->{
                     it.body().toString().let {
@@ -47,13 +47,22 @@ fun <T> safeApiCall(call: suspend () -> Response<T>) = flow {
 
                 }
                 else ->{
-                     //NOTHING FOR NOW
+                    Timber.d("Network : ==> ${response.code()} ---- ${"response.message()"}")
+                    val errorJson = JsonObject().apply {
+                        var msg = response.message()
+                        if(msg.isNullOrEmpty()){
+                            msg = "Error : ${response.code()}"
+                        }
+                        addProperty("message",msg)
+                    }
+                    emit(HqResponseModel.Error(555,errorJson))
                 }
             }
 
         }
 
     } catch (t: Throwable) {
+        Timber.d("Network : ==> Exception ---- ${t.message}")
         val errJson = JsonObject()
         errJson.addProperty("message",t.message)
         emit(HqResponseModel.Error(555,errJson))

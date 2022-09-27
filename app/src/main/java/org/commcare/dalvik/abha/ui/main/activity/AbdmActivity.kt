@@ -72,7 +72,9 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     }
 
-
+    /**
+     * Verify intent data
+     */
     private fun verifyIntentData() {
         intent.extras?.containsKey("abdm_api_token")?.let { tokenPresent ->
             if (tokenPresent) {
@@ -186,7 +188,6 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         DialogUtility.showDialog(
             this@AbdmActivity,
             msg,
-            { dispatchResult(getBlockedIntent(msg)) },
             DialogType.Blocking
         )
     }
