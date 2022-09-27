@@ -33,12 +33,15 @@ class TestActivity : AppCompatActivity() {
     }
 
     val lang = "en"
-    fun startIntentA() {
+    private val token = "Token 109b062f806baf3b750eaec84bebd5978de095e1"
+
+    private fun startIntentA() {
         val intent = Intent(action).apply {
             putExtras(
                 bundleOf(
                     "abha_id" to "91766261606756",
-                    "lang_code" to lang
+                    "lang_code" to lang,
+                    "abdm_api_token" to token,
                 )
             )
         }
@@ -46,13 +49,13 @@ class TestActivity : AppCompatActivity() {
 
     }
 
-    fun startIntentB() {
+    private fun startIntentB() {
 
         val intent = Intent(action).apply {
             putExtras(
                 bundleOf(
                     "mobile_number" to "9560833229",
-                    "abdm_api_token" to "1122333",
+                    "abdm_api_token" to token,
                     "lang_code" to lang
                 )
             )

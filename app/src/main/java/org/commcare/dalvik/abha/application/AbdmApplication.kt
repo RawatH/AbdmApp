@@ -17,4 +17,8 @@ class AbdmApplication : Application(){
             Timber.plant(Timber.DebugTree())
         }
     }
+
+    companion object{
+        var API_TOKEN = ""
+    }
 }

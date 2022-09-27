@@ -26,5 +26,4 @@ abstract class DataModule {
     abstract fun provideTranslationRepository(translationRepositoryImpl: TranslationRepositoryImpl):TranslationRepository
 
 
-
 }

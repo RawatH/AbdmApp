@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
+import org.commcare.dalvik.abha.application.AbdmApplication
 import org.commcare.dalvik.abha.databinding.AbdmActivityBinding
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.DialogType
@@ -74,7 +75,11 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     private fun verifyIntentData() {
         intent.extras?.containsKey("abdm_api_token")?.let { tokenPresent ->
-            if (!tokenPresent) {
+            if (tokenPresent) {
+                intent.extras?.getString("abdm_api_token")?.let {
+                    AbdmApplication.API_TOKEN = it
+                }
+            } else {
                 dispatchResult(getErrorIntent("API token missing"))
             }
         }

@@ -1,7 +1,5 @@
 package org.commcare.dalvik.abha.di
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.commcare.dalvik.abha.application.AbdmApplication
 import org.commcare.dalvik.data.network.NetworkUtil
 import org.commcare.dalvik.data.services.HqServices
 import org.commcare.dalvik.data.services.TranslationService
@@ -49,7 +48,7 @@ object AppModule {
                         .addHeader("content-type","application/json")
                         .addHeader(
                             "Authorization",
-                            "109b062f806baf3b750eaec84bebd5978de095e1"//"Token 01bed27f81885164999b2adc0e28b8ba8cb58eda"
+                            AbdmApplication.API_TOKEN
                         )
                         .build()
                     chain.proceed(request)
