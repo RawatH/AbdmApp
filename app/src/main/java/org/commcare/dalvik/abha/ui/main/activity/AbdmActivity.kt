@@ -193,7 +193,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
     fun showConnectivityDialog() {
-        val msg = resources.getString(R.string.no_internet_connection)
+        val msg = LanguageManager.getTranslatedValue(TranslationKey.NO_INTERNET)
         DialogUtility.showDialog(
             this@AbdmActivity,
             msg,

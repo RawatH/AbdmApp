@@ -27,6 +27,5 @@
     <string name="accept">Accept</string>
     <string name="ok">Ok</string>
     <string name="app_blocked">OTP request blocked for %s .</string>
-    <string name="no_internet_connection">No internent available.</string>
 
 </resources>
