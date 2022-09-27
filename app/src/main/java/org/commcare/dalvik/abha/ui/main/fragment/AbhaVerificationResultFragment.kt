@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import org.commcare.dalvik.abha.databinding.AbhaVerificationResultBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
+import org.commcare.dalvik.abha.ui.main.activity.AbdmResponseCode
 import org.commcare.dalvik.domain.model.AbhaVerificationResultModel
 
 class AbhaVerificationResultFragment :
@@ -25,7 +26,9 @@ class AbhaVerificationResultFragment :
         super.onClick(view)
         val intent = Intent().apply {
             putExtra("health_id",binding.model?.healthId)
-            putExtra("verified",binding.model?.status)
+            putExtra("code", AbdmResponseCode.SUCCESS.value)
+            putExtra("verified", binding.model?.status)
+            putExtra("message", "")
         }
 
         (activity as AbdmActivity).onAbhaNumberVerification(intent)

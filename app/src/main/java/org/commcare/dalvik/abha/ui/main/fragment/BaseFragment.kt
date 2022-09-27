@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.flow.callbackFlow
+import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
+import org.commcare.dalvik.abha.utility.NetworkHelper
 
 abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflater: LayoutInflater) -> B) :
     Fragment(), View.OnClickListener {
@@ -34,5 +36,15 @@ abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflate
     override fun onClick(view: View?) {
 
     }
+
+    fun hasNetworkConnectivity() :Boolean{
+        val hasConnection = NetworkHelper.isNetworkAvailable(requireActivity())
+
+        if(!hasConnection){
+            (activity as AbdmActivity).showConnectivityDialog()
+        }
+        return hasConnection
+    }
+
 
 }

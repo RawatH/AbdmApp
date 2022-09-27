@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             app:counterEnabled="true"
-            app:counterMaxLength="16"
+            app:counterMaxLength="12"
             app:endIconMode="clear_text"
             app:helperTextEnabled="true"
             app:translatedTextKey="@{TranslationKey.BENF_ADHR_NUM}"
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 app:translatedTextKey="@{TranslationKey.BENF_ADHR_NUM}"
                 android:inputType="number"
-                android:maxLength="16"
+                android:maxLength="12"
                 android:text="@={model.abhaRequestModel.aadhaar}" />
         </com.google.android.material.textfield.TextInputLayout>
 

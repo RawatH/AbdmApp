@@ -38,7 +38,7 @@ fun <T> safeApiCall(call: suspend () -> Response<T>) = flow {
                     }
 
                 }
-                422->{
+                400,422->{
                     it.errorBody()?.string()?.let{
                         val gson = GsonBuilder().serializeNulls().create()
                         val adbmError:AbdmErrorModel = gson.fromJson(it, AbdmErrorModel::class.java)

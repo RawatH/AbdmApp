@@ -16,8 +16,6 @@ import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.SelectAuthMethodBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
-import org.commcare.dalvik.abha.utility.DialogType
-import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
@@ -38,8 +36,10 @@ class SelectAuthenticationFragment :
     }
 
     private fun fetchAuthMehtods() {
-        arguments?.getString("abha_id")?.let {
-            viewModel.getAuthenticationMethods(it)
+        if(hasNetworkConnectivity()) {
+            arguments?.getString("abha_id")?.let {
+                viewModel.getAuthenticationMethods(it)
+            }
         }
     }
 

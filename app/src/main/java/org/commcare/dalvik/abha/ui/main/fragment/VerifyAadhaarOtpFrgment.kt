@@ -10,17 +10,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyAadhaarOtpBinding
-import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
-import org.commcare.dalvik.abha.utility.DialogType
-import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
@@ -54,14 +50,16 @@ class VerifyAadhaarOtpFragment :
         /**
          * Request for OTP
          */
-        arguments?.getSerializable("verificationMode")?.let {
-            it as VerificationMode
-            when (it) {
-                VerificationMode.VERIFY_AADHAAR_OTP -> {
-                    requestAadhaarOtp()
-                }
-                VerificationMode.CONFIRM_AADHAAR_OTP -> {
-                    requestAadhaarAuthOtp()
+        if (hasNetworkConnectivity()) {
+            arguments?.getSerializable("verificationMode")?.let {
+                it as VerificationMode
+                when (it) {
+                    VerificationMode.VERIFY_AADHAAR_OTP -> {
+                        requestAadhaarOtp()
+                    }
+                    VerificationMode.CONFIRM_AADHAAR_OTP -> {
+                        requestAadhaarAuthOtp()
+                    }
                 }
             }
         }
@@ -265,6 +263,9 @@ class VerifyAadhaarOtpFragment :
 
     override fun onClick(view: View?) {
         super.onClick(view)
+        if(!hasNetworkConnectivity()){
+            return
+        }
         val verificationMode = arguments?.getSerializable("verificationMode")
         when (view?.id) {
             R.id.resentOtp -> {

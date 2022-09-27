@@ -1,6 +1,8 @@
 package org.commcare.dalvik.abha.ui.main.activity
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
@@ -69,7 +71,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     }
 
-    private fun attachBackPressListener(){
+    private fun attachBackPressListener() {
         onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
 
@@ -96,7 +98,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
      */
     private fun observeBlockedOtpRequest() {
         lifecycleScope.launch(Dispatchers.Main) {
-            viewmodel.otpRequestBlocked.asFlow().collect {  otpBlockedRequest ->
+            viewmodel.otpRequestBlocked.asFlow().collect { otpBlockedRequest ->
                 otpBlockedRequest?.let {
                     DialogUtility.showDialog(
                         this@AbdmActivity,
@@ -183,7 +185,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         putExtra("message", msg)
     }
 
-    fun showBlockerDialog(msg:String){
+    fun showBlockerDialog(msg: String) {
         DialogUtility.showDialog(
             this@AbdmActivity,
             msg,
@@ -192,7 +194,21 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         )
     }
 
+    fun isNetworkAvailable(): Boolean {
+        val conManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val internetInfo = conManager.activeNetworkInfo
+        return internetInfo != null && internetInfo.isConnected
+    }
 
+    fun showConnectivityDialog() {
+        val msg = resources.getString(R.string.no_internet_connection)
+        DialogUtility.showDialog(
+            this@AbdmActivity,
+            msg,
+            { dispatchResult(getBlockedIntent(msg)) },
+            DialogType.Blocking
+        )
+    }
 
 }
 

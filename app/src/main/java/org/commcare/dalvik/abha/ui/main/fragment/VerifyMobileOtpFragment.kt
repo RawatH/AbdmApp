@@ -53,16 +53,18 @@ class VerifyMobileOtpFragment :
         /**
          * Request for OTP
          */
-        arguments?.getSerializable("verificationMode")?.let {
-            it as VerificationMode
-            when (it) {
-                VerificationMode.VERIFY_MOBILE_OTP -> {
-                    requestMobileOtp()
-                }
-                VerificationMode.CONFIRM_MOBILE_OTP -> {
-                    requestMobileAuthOtp()
-                }
+        if (hasNetworkConnectivity()) {
+            arguments?.getSerializable("verificationMode")?.let {
+                it as VerificationMode
+                when (it) {
+                    VerificationMode.VERIFY_MOBILE_OTP -> {
+                        requestMobileOtp()
+                    }
+                    VerificationMode.CONFIRM_MOBILE_OTP -> {
+                        requestMobileAuthOtp()
+                    }
 
+                }
             }
         }
     }
@@ -259,6 +261,9 @@ class VerifyMobileOtpFragment :
 
     override fun onClick(view: View?) {
         super.onClick(view)
+        if(!hasNetworkConnectivity()){
+            return
+        }
         val verificationMode = arguments?.getSerializable("verificationMode")
         when (view?.id) {
             R.id.resentOtp -> {

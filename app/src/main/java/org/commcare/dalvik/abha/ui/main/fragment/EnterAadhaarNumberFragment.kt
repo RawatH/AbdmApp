@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,6 +25,7 @@ import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
+import org.commcare.dalvik.abha.utility.NetworkHelper
 import org.commcare.dalvik.abha.utility.checkMobileFirstNumber
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
@@ -43,19 +45,12 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         binding.clickHandler = this
         attachUiStateObserver()
         populateIntentData()
-        checkForBlockedState()
     }
 
-    private fun checkForBlockedState() {
-
-    }
 
     private fun populateIntentData() {
         arguments?.getString("mobile_number")?.apply {
             val abhaRequestModel = AbhaRequestModel(this)
-            abhaRequestModel.aadhaar =
-                    "565141729442"
-//                "232755042430"
             viewModel.init(abhaRequestModel)
             observeRequestModel()
         }
@@ -121,7 +116,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
                 viewModel.checkForBlockedState(aadhaarKey).collect {
                     when (it) {
