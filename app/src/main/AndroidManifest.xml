@@ -3,7 +3,7 @@
     package="org.commcare.dalvik.abha">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".application.AbdmApplication"
@@ -17,21 +17,21 @@
         android:theme="@style/Theme.ABDMApp">
         <activity
             android:name=".ui.main.activity.AbdmActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
-                <action android:name="org.commcare.dalvik.abha.abdm.app"/>
+                <action android:name="org.commcare.dalvik.abha.abdm.app" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-   <activity
+        <!--<activity
             android:name=".ui.main.activity.TestActivity"
             android:exported="true">
-           <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity>-->
     </application>
 
 </manifest>
