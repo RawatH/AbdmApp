@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.commcare.dalvik.abha.R
@@ -25,6 +26,7 @@ import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.utility.checkMobileFirstNumber
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.OtpCallState
 import org.commcare.dalvik.domain.model.LanguageManager
 import org.commcare.dalvik.domain.model.OtpResponseModel
 import timber.log.Timber
@@ -43,14 +45,16 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         checkForBlockedState()
     }
 
-    private fun checkForBlockedState(){
+    private fun checkForBlockedState() {
 
     }
 
     private fun populateIntentData() {
         arguments?.getString("mobile_number")?.apply {
-            val abhaRequestModel = AbhaRequestModel(this )
-            abhaRequestModel.aadhaar = "232755042430"
+            val abhaRequestModel = AbhaRequestModel(this)
+            abhaRequestModel.aadhaar =
+                    //"565141729442"
+                "232755042430"
             viewModel.init(abhaRequestModel)
             observeRequestModel()
         }
@@ -59,16 +63,15 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
     /**
      * Observer ABHA request data
      */
-    private fun observeRequestModel(){
-        viewModel.abhaRequestModel.observe(viewLifecycleOwner){
+    private fun observeRequestModel() {
+        viewModel.abhaRequestModel.observe(viewLifecycleOwner) {
             if (!binding.mobileNumEt.checkMobileFirstNumber()) {
                 binding.mobileNumInputLayout.helperText =
                     resources.getText(R.string.mobile_start_number)
             }
-           viewModel.validateData()
+            viewModel.validateData()
         }
     }
-
 
 
     private fun attachUiStateObserver() {
@@ -89,7 +92,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                             binding.generateOtp.isEnabled = true
                         }
 
-                        is GenerateAbhaUiState.TranslationReceived ->{
+                        is GenerateAbhaUiState.TranslationReceived -> {
                             Handler(Looper.getMainLooper()).post {
                                 binding.invalidateAll()
                             }
@@ -99,13 +102,21 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                             Timber.d("XXXXXXXX" + it.data)
                             binding.generateOtp.isEnabled = true
                             binding.aadharNumberEt.isEnabled = true
-                            DialogUtility.showDialog(requireContext(), it.data.toString() , type = DialogType.Blocking)
+                            DialogUtility.showDialog(
+                                requireContext(),
+                                it.data.toString(),
+                                type = DialogType.Blocking
+                            )
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
-                        is  GenerateAbhaUiState.AbdmError->{
+                        is GenerateAbhaUiState.AbdmError -> {
                             binding.generateOtp.isEnabled = true
                             binding.aadharNumberEt.isEnabled = true
-                            DialogUtility.showDialog(requireContext(), it.data.getActualMessage() , type = DialogType.Blocking )
+                            DialogUtility.showDialog(
+                                requireContext(),
+                                it.data.getActualMessage(),
+                                type = DialogType.Blocking
+                            )
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
                     }
@@ -117,12 +128,28 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        navigateToAadhaarOtpVerificationScreen()
+        lifecycleScope.launch{
+            viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                viewModel.checkForBlockedState(aadhaarKey).collect {
+                    when (it) {
+                        OtpCallState.OtpReqAvailable -> {
+                            navigateToAadhaarOtpVerificationScreen()
+                        }
+                        is OtpCallState.OtpReqBlocked -> {
+                            viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun navigateToAadhaarOtpVerificationScreen() {
         val bundle = bundleOf("verificationMode" to VerificationMode.VERIFY_AADHAAR_OTP)
-        findNavController().navigate(R.id.action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment ,bundle)
+        findNavController().navigate(
+            R.id.action_enterAbhaCreationDetailsFragment_to_verifyAadhaarOtpFragment,
+            bundle
+        )
     }
 
 

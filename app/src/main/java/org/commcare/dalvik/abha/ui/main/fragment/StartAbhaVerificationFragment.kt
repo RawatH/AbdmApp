@@ -15,6 +15,7 @@ import org.commcare.dalvik.abha.databinding.StartAbhaVerificationBinding
 import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.OtpCallState
 
 class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>(StartAbhaVerificationBinding::inflate) {
 
@@ -40,7 +41,20 @@ class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>
 
     override fun onClick(view: View?) {
         super.onClick(view)
-        findNavController().navigate(R.id.action_startAbhaVerificationFragment_to_selectAuthenticationFragment ,arguments)
+        lifecycleScope.launch{
+            viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+                viewModel.checkForBlockedState(abhaIdKey).collect {
+                    when (it) {
+                        OtpCallState.OtpReqAvailable -> {
+                            findNavController().navigate(R.id.action_startAbhaVerificationFragment_to_selectAuthenticationFragment ,arguments)
+                        }
+                        is OtpCallState.OtpReqBlocked -> {
+                            viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun attachUiStateObserver() {

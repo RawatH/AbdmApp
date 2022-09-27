@@ -31,7 +31,7 @@
                 style="@style/EditTextStyle"
                 android:enabled="false"
                 app:translatedTextKey="@{TranslationKey.BENF_ABHA_NUM}"
-                android:maxLength="10"
+                android:maxLength="14"
                 android:inputType="number"
                 />
         </com.google.android.material.textfield.TextInputLayout>

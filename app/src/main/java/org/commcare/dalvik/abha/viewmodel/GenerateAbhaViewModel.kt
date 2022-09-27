@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.PropMutableLiveData
@@ -35,9 +36,7 @@ class GenerateAbhaViewModel @Inject constructor(
     var abhaRequestModel: PropMutableLiveData<AbhaRequestModel> = PropMutableLiveData()
     val abhaDetailModel: MutableLiveData<AbhaDetailModel> = MutableLiveData()
     val uiState = MutableStateFlow<GenerateAbhaUiState>(GenerateAbhaUiState.InvalidState)
-    val otpRequestBlocked: MutableLiveData<Boolean> = MutableLiveData()
-
-    val otpCallState = MutableStateFlow<OtpCallState>(OtpCallState.None)
+    val otpRequestBlocked: MutableLiveData<OtpRequestCallModel> = MutableLiveData()
 
     fun init(reqModel: AbhaRequestModel) {
         abhaRequestModel.setValue(reqModel)
@@ -49,7 +48,7 @@ class GenerateAbhaViewModel @Inject constructor(
         }
     }
 
-    fun checkIfBlocked() = saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey())
+//    fun checkIfBlocked() = saveDataUsecase.executeFetch(PrefKeys.OTP_BLOCKED_TS.getKey())
 
     fun validateData() {
         viewModelScope.launch {
@@ -179,7 +178,7 @@ class GenerateAbhaViewModel @Inject constructor(
      */
     fun getAuthOtp(healthId: String, authMethod: String) {
         viewModelScope.launch {
-            //save otp req call count
+           //save otp req call count
             abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
                 saveOtpRequestCallCount(abhaIdKey)
             }
@@ -469,22 +468,28 @@ class GenerateAbhaViewModel @Inject constructor(
 
                     if (it != null) {
                         savedJson = Gson().fromJson(it, JsonObject::class.java)
-                        otpRequestModel = Gson().fromJson(savedJson.get(key).asString , OtpRequestCallModel::class.java)
-                        otpRequestModel.increaseOtpCounter()
-                        savedJson.remove(key)
-                        savedJson.addProperty(key, Gson().toJson(otpRequestModel))
+
+                        if(savedJson.get(key) != null) {
+                            otpRequestModel = Gson().fromJson(
+                                savedJson.get(key).asString,
+                                OtpRequestCallModel::class.java
+                            )
+                            otpRequestModel.increaseOtpCounter()
+                            savedJson.remove(key)
+                            savedJson.addProperty(key, Gson().toJson(otpRequestModel))
+                        }else{
+                            otpRequestModel = OtpRequestCallModel(key, 1)
+                            savedJson.addProperty(otpRequestModel.id, Gson().toJson(otpRequestModel))
+                        }
                     } else {
                         otpRequestModel = OtpRequestCallModel(key, 1)
                         savedJson = JsonObject()
                         savedJson.addProperty(otpRequestModel.id, Gson().toJson(otpRequestModel))
                     }
+                    Timber.d("----- OTP REQ ------ \n ${savedJson}")
+
                     saveData(PrefKeys.OTP_REQUEST.getKey(), savedJson.toString())
 
-//                    if(otpRequestModel.isBlocked()){
-//                        otpCallState.emit(OtpCallState.OtpReqBlocked)
-//                    }else{
-//                        otpCallState.emit(OtpCallState.OtpReqAvailable)
-//                    }
                     true
                 }
 
@@ -493,46 +498,33 @@ class GenerateAbhaViewModel @Inject constructor(
     }
 
     /**
-     * Check if Aadhaar is blocked
+     * Check for BLOCKED KEYS
      */
-    suspend fun checkForBlock(key: String): Boolean {
-        var isBlocked = false
-        val job = viewModelScope.async {
-            saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
-                if (it != null) {
-                    val savedJson = Gson().fromJson(it, JsonObject::class.java)
-                    val otpRequestCallModel = Gson().fromJson(savedJson.get(key).asString , OtpRequestCallModel::class.java)
-                    isBlocked = otpRequestCallModel.isBlocked()
-                    if (otpRequestCallModel.isBlocked()) {
-                        otpRequestBlocked.value = true
-                    }
-                }
-                true
-            }
-        }
-        job.await()
-        return isBlocked
-    }
+    fun checkForBlockedState(key: String) = flow {
+        saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
+            if (it != null) {
+                val savedJson = Gson().fromJson(it, JsonObject::class.java)
+                if(savedJson.has(key)) {
+                    val otpRequestCallModel = Gson().fromJson(
+                        savedJson.get(key).asString,
+                        OtpRequestCallModel::class.java
+                    )
 
-    fun checkForBlock1(key: String) {
-        viewModelScope.launch {
-            saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
-
-                if (it != null) {
-                    val savedJson = Gson().fromJson(it, JsonObject::class.java)
-                    val otpRequestCallModel= Gson().fromJson(savedJson.get(key).asString , OtpRequestCallModel::class.java)
+                    otpRequestCallModel.tryUnBlocking()
 
                     if (otpRequestCallModel.isBlocked()) {
-                        otpRequestBlocked.value = true
-                        otpCallState.emit(OtpCallState.OtpReqBlocked)
-                    }else{
-                        otpCallState.emit(OtpCallState.OtpReqAvailable)
+                        emit(OtpCallState.OtpReqBlocked(otpRequestCallModel))
+                    } else {
+                        emit(OtpCallState.OtpReqAvailable)
                     }
+
                 }else{
-                    otpCallState.emit(OtpCallState.OtpReqAvailable)
+                    emit(OtpCallState.OtpReqAvailable)
                 }
-                true
+            }else{
+                emit(OtpCallState.OtpReqAvailable)
             }
+            true
         }
     }
 
@@ -552,8 +544,7 @@ class GenerateAbhaViewModel @Inject constructor(
  */
 
 sealed class OtpCallState {
-    object None : OtpCallState()
-    object OtpReqBlocked : OtpCallState()
+    class OtpReqBlocked(val otpRequestCallModel: OtpRequestCallModel) : OtpCallState()
     object OtpReqAvailable : OtpCallState()
 }
 

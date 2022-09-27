@@ -6,6 +6,6 @@ class AppConstants {
         val AADHAAR_OTP_LENGTH = 6
         val AADHAR_NUMBER_LENGTH = 12
         val MOBILE_NUMBER_LENGTH = 10
-        val OTP_BLOCK_TS = 15 * 60 * 1000
+        val OTP_BLOCK_TS = 30 * 60 * 1000
     }
 }

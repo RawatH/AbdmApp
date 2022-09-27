@@ -67,35 +67,44 @@ class VerifyAadhaarOtpFragment :
 
     }
 
+    /**
+     * Request AADHAAR OTP
+     */
     private fun requestAadhaarOtp() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.otpCallState.collect {
-                when (it) {
-                    OtpCallState.None -> {
-                        viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
-                            viewModel.checkForBlock1(aadhaarKey)
+        lifecycleScope.launch{
+            viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                viewModel.checkForBlockedState(aadhaarKey).collect {
+                    when (it) {
+                        OtpCallState.OtpReqAvailable -> {
+                            viewModel.requestAadhaarOtp()
                         }
-                    }
-
-                    OtpCallState.OtpReqAvailable -> {
-                        viewModel.requestAadhaarOtp()
-                    }
-
-                    OtpCallState.OtpReqBlocked -> {
-                       viewModel.otpRequestBlocked.value = true
+                        is OtpCallState.OtpReqBlocked -> {
+                            viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                        }
                     }
                 }
             }
-
         }
-
-//        viewModel.requestAadhaarOtp()
     }
 
+    /**
+     * Request AADHAAR AUTH_OTP
+     */
     private fun requestAadhaarAuthOtp() {
-        arguments?.getString("abhaId")?.let { healthId ->
-            viewModel.selectedAuthMethod?.let {
-                viewModel.getAuthOtp(healthId, it)
+        lifecycleScope.launch{
+            arguments?.getString("abhaId")?.let { healthId ->
+                viewModel.selectedAuthMethod?.let { selectedAuthMethod ->
+                    viewModel.checkForBlockedState(healthId).collect {
+                        when (it) {
+                            OtpCallState.OtpReqAvailable -> {
+                                viewModel.getAuthOtp(healthId, selectedAuthMethod)
+                            }
+                            is OtpCallState.OtpReqBlocked -> {
+                                viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                            }
+                        }
+                    }
+                }
             }
         }
     }

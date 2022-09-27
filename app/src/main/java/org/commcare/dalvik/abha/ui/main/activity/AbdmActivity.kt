@@ -3,6 +3,8 @@ package org.commcare.dalvik.abha.ui.main.activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
@@ -59,7 +61,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
         observeLoader()
-        observerOtpBlock()
+        observeBlockedOtpRequest()
 
         intent.extras?.getString("lang_code")?.let {
             viewmodel.getTranslation(it)
@@ -67,19 +69,15 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     }
 
-    private fun observerOtpBlock(){
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewmodel.otpRequestBlocked.asFlow().collect { isOtpBlocked ->
-                if (isOtpBlocked) {
-                    DialogUtility.showDialog(
-                        this@AbdmActivity,
-                       "Blocked",
-                        { dispatchResult(getBlockedIntent("Blocked ,multiple OTP requested.")) }, DialogType.Blocking
-                    )
-                }
+    private fun attachBackPressListener(){
+        onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+
             }
-        }
+        })
     }
+
+
     private fun verifyIntentData() {
         intent.extras?.containsKey("abdm_api_token")?.let { tokenPresent ->
             if (!tokenPresent) {
@@ -93,24 +91,19 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     }
 
-    private fun checkForBlockScenario() {
+    /**
+     * Observer Blocked OTP request
+     */
+    private fun observeBlockedOtpRequest() {
         lifecycleScope.launch(Dispatchers.Main) {
-            viewmodel.checkIfBlocked().collect { ts ->
-                ts?.let {
-                    val blockTimeSpent = System.currentTimeMillis() - ts.toLong()
-                    if (blockTimeSpent < AppConstants.OTP_BLOCK_TS) {
-                        val timeLeft = AppConstants.OTP_BLOCK_TS - blockTimeSpent
-                        val minutesLeft = (timeLeft / 1000) / 60
-                        val secondsLeft = (timeLeft / 1000) % 60
-                        val timeLeftStr = minutesLeft.toString() + "min : ${secondsLeft}sec"
-                        DialogUtility.showDialog(
-                            this@AbdmActivity,
-                            resources.getString(R.string.app_blocked, timeLeftStr),
-                            { dispatchResult(Intent()) }, DialogType.Blocking
-                        )
-                    } else {
-                        viewmodel.clearBlockState()
-                    }
+            viewmodel.otpRequestBlocked.asFlow().collect {  otpBlockedRequest ->
+                otpBlockedRequest?.let {
+                    DialogUtility.showDialog(
+                        this@AbdmActivity,
+                        resources.getString(R.string.app_blocked, it.getTimeLeftToUnblock()),
+                        { dispatchResult(getBlockedIntent("Blocked ,multiple OTP requested.")) },
+                        DialogType.Blocking
+                    )
                 }
 
             }
@@ -179,13 +172,15 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
     private fun getErrorIntent(msg: String) = Intent().apply {
-        putExtra("verified", "failure")
-        putExtra("response_status", msg)
+        putExtra("verified", "false")
+        putExtra("code", AbdmResponseCode.FAILURE.value)
+        putExtra("message", msg)
     }
 
     private fun getBlockedIntent(msg: String) = Intent().apply {
-        putExtra("verified", "failure")
-        putExtra("response_status", msg)
+        putExtra("verified", "false")
+        putExtra("code", AbdmResponseCode.FAILURE.value)
+        putExtra("message", msg)
     }
 
 }
@@ -198,4 +193,16 @@ enum class VerificationMode : Serializable {
     VERIFY_AADHAAR_OTP,
     CONFIRM_MOBILE_OTP,
     CONFIRM_AADHAAR_OTP
+}
+
+/**
+ * Intent Response
+ */
+enum class AbdmResponseCode(val value: Int) {
+    SUCCESS(200),
+    FAILURE(333);
+
+    companion object {
+        fun fromInt(value: Int) = AbdmResponseCode.values().first { it.value == value }
+    }
 }

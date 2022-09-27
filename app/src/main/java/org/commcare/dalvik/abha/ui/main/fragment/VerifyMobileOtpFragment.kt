@@ -21,6 +21,7 @@ import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.OtpCallState
 import org.commcare.dalvik.abha.viewmodel.RequestType
 import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
 import org.commcare.dalvik.data.util.PrefKeys
@@ -67,15 +68,44 @@ class VerifyMobileOtpFragment :
 
     }
 
-
+    /**
+     * Request Request MOBILE_OTP
+     */
     private fun requestMobileOtp() {
-        viewModel.requestMobileOtp()
+        lifecycleScope.launch{
+            viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                viewModel.checkForBlockedState(aadhaarKey).collect {
+                    when (it) {
+                        OtpCallState.OtpReqAvailable -> {
+                            viewModel.requestMobileOtp()
+                        }
+                        is OtpCallState.OtpReqBlocked -> {
+                            viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                        }
+                    }
+                }
+            }
+        }
     }
 
+    /**
+     * Request AADHAAR AUTH_OTP
+     */
     private fun requestMobileAuthOtp() {
-        arguments?.getString("abhaId")?.let { healthId ->
-            viewModel.selectedAuthMethod?.let {
-                viewModel.getAuthOtp(healthId, it)
+        lifecycleScope.launch{
+            arguments?.getString("abhaId")?.let { healthId ->
+                viewModel.selectedAuthMethod?.let { selectedAuthMethod ->
+                    viewModel.checkForBlockedState(healthId).collect {
+                        when (it) {
+                            OtpCallState.OtpReqAvailable -> {
+                                viewModel.getAuthOtp(healthId, selectedAuthMethod)
+                            }
+                            is OtpCallState.OtpReqBlocked -> {
+                                viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                            }
+                        }
+                    }
+                }
             }
         }
     }

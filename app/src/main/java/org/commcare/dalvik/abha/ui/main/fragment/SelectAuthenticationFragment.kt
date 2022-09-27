@@ -20,6 +20,7 @@ import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
+import org.commcare.dalvik.domain.model.LanguageManager
 
 class SelectAuthenticationFragment :
     BaseFragment<SelectAuthMethodBinding>(SelectAuthMethodBinding::inflate),
@@ -54,7 +55,7 @@ class SelectAuthenticationFragment :
                                     it.data.getAsJsonArray("auth_methods")
                                         .forEach {
                                             if (filter.contains(it.asString)) {
-                                                authList.add(it.asString)
+                                                authList.add(LanguageManager.getTranslatedValue(it.asString))
                                             }
                                         }
                                     val adapter =
