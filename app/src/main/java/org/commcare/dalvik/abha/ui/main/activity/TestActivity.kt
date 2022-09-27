@@ -14,6 +14,8 @@ class TestActivity : AppCompatActivity() {
     val REQ_CODE_A = 100
     val REQ_CODE_B = 101
 
+    val action = "org.commcare.dalvik.abha.abdm.app"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
@@ -31,10 +33,10 @@ class TestActivity : AppCompatActivity() {
     }
 
     fun startIntentA() {
-        val intent = Intent(this, AbdmActivity::class.java).apply {
+        val intent = Intent(action).apply {
             putExtras(
                 bundleOf(
-//                    "abha_id" to "91766261606756",
+                    "abha_id" to "91766261606756",
                     "lang_code" to "en"
                 )
             )
@@ -45,10 +47,10 @@ class TestActivity : AppCompatActivity() {
 
     fun startIntentB() {
 
-        val intent = Intent(this, AbdmActivity::class.java).apply {
+        val intent = Intent(action).apply {
             putExtras(
                 bundleOf(
-//                    "mobile_number" to "9560833229",
+                    "mobile_number" to "9560833229",
                     "abdm_api_token" to "1122333",
                     "lang_code" to "en"
                 )

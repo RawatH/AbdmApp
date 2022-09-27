@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
 import org.commcare.dalvik.abha.model.AbhaRequestModel
+import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
@@ -211,6 +212,7 @@ class VerifyMobileOtpFragment :
                                     binding.mobileOtpEt.setText("")
                                 }
                             }
+                            (activity as AbdmActivity).showBlockerDialog(it.data.get("message").asString)
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 
@@ -229,6 +231,7 @@ class VerifyMobileOtpFragment :
                                     binding.mobileOtpEt.setText("")
                                 }
                             }
+                            (activity as AbdmActivity).showBlockerDialog(it.data.getActualMessage())
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
                     }

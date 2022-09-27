@@ -71,14 +71,6 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     }
 
-    private fun attachBackPressListener() {
-        onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-
-            }
-        })
-    }
-
 
     private fun verifyIntentData() {
         intent.extras?.containsKey("abdm_api_token")?.let { tokenPresent ->

@@ -55,8 +55,8 @@ fun <T> safeApiCall(call: suspend () -> Response<T>) = flow {
 
     } catch (t: Throwable) {
         val errJson = JsonObject()
-        errJson.addProperty("msg",t.message)
-        emit(HqResponseModel.Error(333,errJson))
+        errJson.addProperty("message",t.message)
+        emit(HqResponseModel.Error(555,errJson))
     }
 }
 

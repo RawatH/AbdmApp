@@ -81,6 +81,7 @@ class SelectAuthenticationFragment :
                         }
 
                         is GenerateAbhaUiState.Error -> {
+                            (activity as AbdmActivity).showBlockerDialog(it.data.get("message").asString)
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 

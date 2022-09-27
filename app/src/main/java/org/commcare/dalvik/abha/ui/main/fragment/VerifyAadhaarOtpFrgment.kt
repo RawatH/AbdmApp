@@ -207,6 +207,7 @@ class VerifyAadhaarOtpFragment :
                                     Timber.d("Error AADHAAR AUTH OTP")
                                 }
                             }
+                            (activity as AbdmActivity).showBlockerDialog(it.data.get("message").asString)
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 

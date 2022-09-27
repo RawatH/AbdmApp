@@ -15,12 +15,18 @@ class TranslationRepositoryImpl @Inject constructor(private val translationServi
     TranslationRepository {
     override suspend fun getTranslationData(langCode: String): TranslationModel? {
         val job = CoroutineScope(Dispatchers.IO).async {
+
             translationService.getTranslationData(NetworkUtil.getTranslationEndpoint(langCode)).body()
         }
 
-        return job.await() ?: Gson().fromJson(
-            LanguageManager.DEFAULT_TRANSLATIONS,
-            TranslationModel::class.java
-        )
+        return try{
+            job.await()
+        }catch (e:Exception){
+            Gson().fromJson(
+                LanguageManager.DEFAULT_TRANSLATIONS,
+                TranslationModel::class.java
+            )
+        }
+
     }
 }
