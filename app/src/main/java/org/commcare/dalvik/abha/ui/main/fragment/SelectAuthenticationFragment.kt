@@ -14,6 +14,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.SelectAuthMethodBinding
+import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
@@ -84,11 +85,7 @@ class SelectAuthenticationFragment :
                         }
 
                         is GenerateAbhaUiState.AbdmError -> {
-                            DialogUtility.showDialog(
-                                requireContext(),
-                                it.data.getActualMessage(),
-                                type = DialogType.Blocking
-                            )
+                            (activity as AbdmActivity).showBlockerDialog(it.data.getActualMessage())
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
 

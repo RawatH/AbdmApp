@@ -1,5 +1,7 @@
 package org.commcare.dalvik.domain.model
 
+import timber.log.Timber
+
 const val OTP_BLOCK_TIME = 15 * 60 * 1000
 
 data class OtpRequestCallModel(
@@ -12,6 +14,10 @@ data class OtpRequestCallModel(
 
     fun increaseOtpCounter() {
         counter += 1
+        if(counter >= 4){
+            blockedTS = System.currentTimeMillis()
+            Timber.d("----- OTP STATE ------ Blocking $id ---- $blockedTS")
+        }
     }
 
     fun tryUnBlocking() {

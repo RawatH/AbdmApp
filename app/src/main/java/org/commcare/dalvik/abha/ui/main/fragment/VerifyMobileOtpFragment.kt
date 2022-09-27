@@ -65,7 +65,6 @@ class VerifyMobileOtpFragment :
 
             }
         }
-
     }
 
     /**
@@ -265,12 +264,12 @@ class VerifyMobileOtpFragment :
             R.id.resentOtp -> {
                 when (verificationMode) {
                     VerificationMode.CONFIRM_MOBILE_OTP -> {
-                        viewModel.confirmMobileAuthOtp(getMobileOtpRequestModel())
+                        requestMobileAuthOtp()
                     }
                     else -> {
                         binding.verifyOtp.isEnabled = false
                         binding.resentOtp.isEnabled = false
-                        viewModel.requestMobileOtp()
+                        requestMobileOtp()
                     }
                 }
             }

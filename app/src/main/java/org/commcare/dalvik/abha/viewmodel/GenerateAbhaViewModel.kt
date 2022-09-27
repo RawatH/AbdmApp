@@ -486,7 +486,7 @@ class GenerateAbhaViewModel @Inject constructor(
                         savedJson = JsonObject()
                         savedJson.addProperty(otpRequestModel.id, Gson().toJson(otpRequestModel))
                     }
-                    Timber.d("----- OTP REQ ------ \n ${savedJson}")
+                    Timber.d("----- OTP STATE ------ \n ${savedJson}")
 
                     saveData(PrefKeys.OTP_REQUEST.getKey(), savedJson.toString())
 

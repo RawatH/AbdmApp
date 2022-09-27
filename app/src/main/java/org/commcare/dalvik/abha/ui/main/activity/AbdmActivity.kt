@@ -183,6 +183,17 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         putExtra("message", msg)
     }
 
+    fun showBlockerDialog(msg:String){
+        DialogUtility.showDialog(
+            this@AbdmActivity,
+            msg,
+            { dispatchResult(getBlockedIntent(msg)) },
+            DialogType.Blocking
+        )
+    }
+
+
+
 }
 
 /**

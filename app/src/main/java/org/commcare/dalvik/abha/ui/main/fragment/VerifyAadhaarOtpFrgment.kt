@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyAadhaarOtpBinding
 import org.commcare.dalvik.abha.model.AbhaRequestModel
+import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
@@ -71,7 +72,7 @@ class VerifyAadhaarOtpFragment :
      * Request AADHAAR OTP
      */
     private fun requestAadhaarOtp() {
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
                 viewModel.checkForBlockedState(aadhaarKey).collect {
                     when (it) {
@@ -91,7 +92,7 @@ class VerifyAadhaarOtpFragment :
      * Request AADHAAR AUTH_OTP
      */
     private fun requestAadhaarAuthOtp() {
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             arguments?.getString("abhaId")?.let { healthId ->
                 viewModel.selectedAuthMethod?.let { selectedAuthMethod ->
                     viewModel.checkForBlockedState(healthId).collect {
@@ -229,11 +230,7 @@ class VerifyAadhaarOtpFragment :
                                     }
                                 }
                             }
-                            DialogUtility.showDialog(
-                                requireContext(),
-                                it.data.getActualMessage(),
-                                type = DialogType.Blocking
-                            )
+                            (activity as AbdmActivity).showBlockerDialog(it.data.getActualMessage())
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
                     }
@@ -276,7 +273,7 @@ class VerifyAadhaarOtpFragment :
                         requestAadhaarAuthOtp()
                     }
                     VerificationMode.VERIFY_AADHAAR_OTP -> {
-                        viewModel.requestAadhaarOtp()
+                        requestAadhaarOtp()
                     }
                 }
 
@@ -287,7 +284,7 @@ class VerifyAadhaarOtpFragment :
                     VerificationMode.CONFIRM_AADHAAR_OTP -> {
                         viewModel.confirmAadhaarAuthOtp(getAadhaarOtpVeriyModel())
                     }
-                    else -> {
+                    VerificationMode.VERIFY_AADHAAR_OTP -> {
                         viewModel.verifyAadhaarOtp(getAadhaarOtpVeriyModel())
                     }
                 }

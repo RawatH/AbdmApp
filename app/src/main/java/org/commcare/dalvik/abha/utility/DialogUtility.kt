@@ -9,17 +9,14 @@ import kotlin.reflect.typeOf
 
 object DialogUtility {
 
-    fun getTheme(type: DialogType) = when (type) {
+    private fun getTheme(type: DialogType) = when (type) {
         DialogType.Blocking -> {
-            R.style.DialogThemeWarning
+            R.style.DialogThemeBlocker
         }
         DialogType.Warning -> {
             R.style.DialogThemeWarning
         }
 
-        DialogType.Error -> {
-            R.style.DialogThemeGeneral
-        }
         else -> {
             R.style.DialogThemeGeneral
         }
@@ -38,8 +35,8 @@ object DialogUtility {
     }
 
 
-    fun showDialog(context: Context, msg: String, type: DialogType = DialogType.General) {
-        getDialogBuilder(context, msg ,type)
+    fun showDialog(context: Context, msg: String) {
+        getDialogBuilder(context, msg)
             .setPositiveButton(context.resources.getString(R.string.ok)) { dialog, which ->
                 dialog.dismiss()
             }
@@ -52,7 +49,7 @@ object DialogUtility {
         actionPositive: () -> Unit,
         type: DialogType = DialogType.General
     ) {
-        getDialogBuilder(context, msg)
+        getDialogBuilder(context, msg ,type)
             .setPositiveButton(context.resources.getString(R.string.ok)) { dialog, which ->
                 actionPositive.invoke()
             }
@@ -63,7 +60,6 @@ object DialogUtility {
 sealed class DialogType {
     object General : DialogType()
     object Warning : DialogType()
-    object Error : DialogType()
     object Blocking : DialogType()
 
 }

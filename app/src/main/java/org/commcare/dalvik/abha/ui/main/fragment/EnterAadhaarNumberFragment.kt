@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.EnterAadhaarBinding
 import org.commcare.dalvik.abha.model.AbhaRequestModel
+import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
@@ -53,8 +54,8 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         arguments?.getString("mobile_number")?.apply {
             val abhaRequestModel = AbhaRequestModel(this)
             abhaRequestModel.aadhaar =
-                    //"565141729442"
-                "232755042430"
+                    "565141729442"
+//                "232755042430"
             viewModel.init(abhaRequestModel)
             observeRequestModel()
         }
@@ -102,21 +103,13 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                             Timber.d("XXXXXXXX" + it.data)
                             binding.generateOtp.isEnabled = true
                             binding.aadharNumberEt.isEnabled = true
-                            DialogUtility.showDialog(
-                                requireContext(),
-                                it.data.toString(),
-                                type = DialogType.Blocking
-                            )
+                            (activity as AbdmActivity).showBlockerDialog(it.data.toString())
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
                         is GenerateAbhaUiState.AbdmError -> {
                             binding.generateOtp.isEnabled = true
                             binding.aadharNumberEt.isEnabled = true
-                            DialogUtility.showDialog(
-                                requireContext(),
-                                it.data.getActualMessage(),
-                                type = DialogType.Blocking
-                            )
+                            (activity as AbdmActivity).showBlockerDialog(it.data.getActualMessage())
                             viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
                         }
                     }
