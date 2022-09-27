@@ -58,7 +58,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
         observeLoader()
         observeOtpFailure()
-        checkForBlockScenario()
+//        checkForBlockScenario()
 
         intent.extras?.getString("lang_code")?.let {
             viewmodel.getTranslation(it)

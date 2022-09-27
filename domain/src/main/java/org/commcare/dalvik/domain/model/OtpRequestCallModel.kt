@@ -1,4 +1,3 @@
 package org.commcare.dalvik.domain.model
 
-class OtpRequestCallModel () {
-}
+data class OtpRequestCallModel (val id:String , val counter:Int)

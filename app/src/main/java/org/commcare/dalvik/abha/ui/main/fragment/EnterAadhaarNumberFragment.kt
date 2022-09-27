@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.EnterAadhaarBinding
+import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
@@ -43,10 +44,11 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
 
     private fun populateIntentData() {
         arguments?.getString("mobile_number")?.apply {
-            viewModel.init(this)
+            val abhaRequestModel = AbhaRequestModel(this )
+            abhaRequestModel.aadhaar = "232755042430"
+            viewModel.init(abhaRequestModel)
             observeRequestModel()
         }
-
     }
 
     /**
@@ -68,6 +70,7 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
+                    Timber.d("=======EMIT ${it.toString()}")
                     when (it) {
                         is GenerateAbhaUiState.Loading -> {
                             binding.generateOtp.isEnabled = !it.isLoading
@@ -77,14 +80,8 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
                             binding.generateOtp.isEnabled = false
                         }
                         is GenerateAbhaUiState.ValidState -> {
+                            binding.aadharNumberEt.isEnabled = true
                             binding.generateOtp.isEnabled = true
-                        }
-                        is GenerateAbhaUiState.Success -> {
-//                            viewModel.uiState.emit(GenerateAbhaUiState.Loading(false))
-//                            val otpModel = Gson().fromJson(it.data,OtpResponseModel::class.java)
-//                            val bundle = bundleOf("txnId" to otpModel.txnId)
-//                            navigateToAadhaarOtpVerificationScreen(bundle)
-//                            binding.generateOtp.isEnabled = true
                         }
 
                         is GenerateAbhaUiState.TranslationReceived ->{

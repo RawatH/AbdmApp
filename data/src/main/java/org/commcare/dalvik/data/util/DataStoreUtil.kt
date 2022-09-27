@@ -66,6 +66,12 @@ enum class PrefKeys {
             return stringPreferencesKey("OTP_BLOCKED_TS")
         }
 
+    },
+    OTP_REQUEST {
+        override fun getKey(): Preferences.Key<String> {
+            return stringPreferencesKey("OTP_REQUEST")
+        }
+
     };
 
     abstract fun getKey(): Preferences.Key<String>

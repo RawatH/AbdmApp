@@ -1,14 +1,9 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -16,18 +11,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.SelectAuthMethodBinding
-import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
-import org.commcare.dalvik.domain.model.OtpResponseModel
 
 class SelectAuthenticationFragment :
     BaseFragment<SelectAuthMethodBinding>(SelectAuthMethodBinding::inflate),

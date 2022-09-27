@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyAadhaarOtpBinding
-import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
+import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
@@ -125,7 +125,6 @@ class VerifyAadhaarOtpFragment :
                                     binding.aadhaarOtpEt.requestFocus()
                                     val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
-                                    viewModel.abhaRequestModel.setValue(AbhaNumberRequestModel(""))
                                     viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
                                     binding.aadhaarOtpEt.isEnabled = true
                                     binding.timeProgress.startTimer()

@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
-import org.commcare.dalvik.abha.model.AbhaNumberRequestModel
+import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
@@ -118,7 +118,6 @@ class VerifyMobileOtpFragment :
                                     binding.timeProgress.startTimer()
                                     val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
-                                    viewModel.abhaRequestModel.setValue(AbhaNumberRequestModel(""))
                                     viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
                                 }
 
@@ -241,7 +240,7 @@ class VerifyMobileOtpFragment :
                     else -> {
                         binding.verifyOtp.isEnabled = false
                         binding.resentOtp.isEnabled = false
-                        viewModel.resendMobileOtpRequest()
+                        viewModel.requestMobileOtp()
                     }
                 }
             }

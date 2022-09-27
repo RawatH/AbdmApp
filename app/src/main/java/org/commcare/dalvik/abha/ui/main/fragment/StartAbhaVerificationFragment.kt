@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.StartAbhaVerificationBinding
+import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 
@@ -30,6 +31,9 @@ class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>
     private fun populateIntentData() {
         arguments?.getString("abha_id")?.apply {
             binding.abhaNumberEt.setText(this)
+            val abhaRequestModel = AbhaRequestModel()
+            abhaRequestModel.abhaId = this
+            viewModel.init(abhaRequestModel)
         }
 
     }

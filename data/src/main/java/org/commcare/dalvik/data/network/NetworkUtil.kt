@@ -47,7 +47,7 @@ fun <T> safeApiCall(call: suspend () -> Response<T>) = flow {
 
                 }
                 else ->{
-
+                     //NOTHING FOR NOW
                 }
             }
 

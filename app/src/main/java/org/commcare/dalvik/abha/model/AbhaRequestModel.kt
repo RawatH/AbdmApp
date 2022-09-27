@@ -5,7 +5,7 @@ import androidx.databinding.Bindable
 import org.commcare.dalvik.abha.BR
 
 
-data class AbhaNumberRequestModel(val mobileNumber: String) : BaseObservable() {
+data class AbhaRequestModel(val mobileNumber: String = "") : BaseObservable() {
 
     var txnId: String = ""
         @Bindable get
@@ -21,19 +21,12 @@ data class AbhaNumberRequestModel(val mobileNumber: String) : BaseObservable() {
             notifyPropertyChanged(BR.aadhaar)
         }
 
-
-    var isMobileOtpVerified: Boolean = false
+    var abhaId: String = ""
         @Bindable get
         set(value) {
             field = value
-            notifyPropertyChanged(BR.mobileOtpVerified)
+            notifyPropertyChanged(BR.abhaId)
         }
 
-    var isAadharOtpVerified: Boolean = false
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.aadharOtpVerified)
-        }
 
 }
