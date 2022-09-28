@@ -163,18 +163,18 @@ class VerifyMobileOtpFragment :
                                     val otResponseModel =
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
                                     viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
-                                    viewModel.abhaRequestModel.value?.abhaId?.let {abhaIdKey ->
-                                        viewModel.clearBlockState(abhaIdKey)
-                                    }
+//                                    viewModel.abhaRequestModel.value?.abhaId?.let {abhaIdKey ->
+//                                        viewModel.clearBlockState(abhaIdKey)
+//                                    }
                                 }
 
                                 RequestType.MOBILE_OTP -> {
                                     binding.mobileOtpEt.isEnabled = true
                                     binding.timeProgress.startTimer()
 
-                                    viewModel.abhaRequestModel.value?.aadhaar?.let {aadhaarKey ->
-                                        viewModel.clearBlockState(aadhaarKey)
-                                    }
+//                                    viewModel.abhaRequestModel.value?.aadhaar?.let {aadhaarKey ->
+//                                        viewModel.clearBlockState(aadhaarKey)
+//                                    }
 
                                 }
 

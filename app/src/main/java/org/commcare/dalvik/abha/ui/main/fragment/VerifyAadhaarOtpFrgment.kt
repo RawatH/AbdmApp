@@ -164,9 +164,9 @@ class VerifyAadhaarOtpFragment :
                                         Gson().fromJson(it.data, OtpResponseModel::class.java)
                                     viewModel.abhaRequestModel.value?.txnId = otResponseModel.txnId
 
-                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
-                                        viewModel.clearBlockState(aadhaarKey)
-                                    }
+//                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+//                                        viewModel.clearBlockState(aadhaarKey)
+//                                    }
                                 }
                                 RequestType.GENERATE_AUTH_OTP -> {
                                     binding.aadhaarOtpEt.requestFocus()
@@ -176,9 +176,9 @@ class VerifyAadhaarOtpFragment :
                                     binding.aadhaarOtpEt.isEnabled = true
                                     binding.timeProgress.startTimer()
 
-                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaId ->
-                                        viewModel.clearBlockState(abhaId)
-                                    }
+//                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaId ->
+//                                        viewModel.clearBlockState(abhaId)
+//                                    }
                                 }
 
                                 /**
