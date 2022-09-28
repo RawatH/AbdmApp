@@ -582,7 +582,13 @@ class GenerateAbhaViewModel @Inject constructor(
                         OtpRequestCallModel::class.java
                     )
 
-                    otpRequestCallModel.tryUnBlocking()
+                    val wasUnblocked = otpRequestCallModel.tryUnBlocking()
+
+                    if(wasUnblocked){
+                        savedJson.remove(key)
+                        savedJson.addProperty(key, Gson().toJson(otpRequestCallModel))
+                        saveData(PrefKeys.OTP_REQUEST.getKey(), savedJson.toString())
+                    }
 
                     if (otpRequestCallModel.isBlocked()) {
                         emit(OtpCallState.OtpReqBlocked(otpRequestCallModel))

@@ -20,14 +20,17 @@ data class OtpRequestCallModel(
         }
     }
 
-    fun tryUnBlocking() {
+    fun tryUnBlocking() : Boolean {
         if (isBlocked()) {
             val timeLeft = OTP_BLOCK_TIME - (System.currentTimeMillis() - blockedTS)
             if (timeLeft <= 0) {
                 counter = 0
                 blockedTS = System.currentTimeMillis()
+                return true
             }
         }
+
+        return false
     }
 
     fun reset() {
