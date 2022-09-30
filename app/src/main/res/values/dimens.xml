@@ -7,6 +7,8 @@
     <dimen name="_5dp">5dp</dimen>
     <dimen name="_16dp">16dp</dimen>
     <dimen name="_2dp">2dp</dimen>
+    <dimen name="guidelineMargin">32dp</dimen>
+
 
     <!-- Text sizes -->
     <dimen name="text_smaller">9dp</dimen>

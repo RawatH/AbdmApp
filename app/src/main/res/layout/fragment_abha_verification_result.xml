@@ -25,14 +25,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="@dimen/_16dp" />
+            app:layout_constraintGuide_begin="@dimen/guidelineMargin" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="@dimen/_16dp" />
+            app:layout_constraintGuide_end="@dimen/guidelineMargin" />
 
         <TextView
             android:id="@+id/verification_status"
@@ -129,7 +129,7 @@
         <Button
             android:id="@+id/returnFromVerification"
             style="@style/RoundStyleButton"
-            android:layout_width="379dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
             android:onClickListener="@{clickHandler}"

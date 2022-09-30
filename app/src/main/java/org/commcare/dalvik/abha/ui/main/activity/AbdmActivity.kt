@@ -1,12 +1,8 @@
 package org.commcare.dalvik.abha.ui.main.activity
 
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
@@ -17,12 +13,10 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.application.AbdmApplication
 import org.commcare.dalvik.abha.databinding.AbdmActivityBinding
-import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
@@ -192,11 +186,6 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         )
     }
 
-    fun isNetworkAvailable(): Boolean {
-        val conManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val internetInfo = conManager.activeNetworkInfo
-        return internetInfo != null && internetInfo.isConnected
-    }
 
     fun showConnectivityDialog() {
         val msg = LanguageManager.getTranslatedValue(TranslationKey.NO_INTERNET)
