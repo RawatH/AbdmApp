@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import org.commcare.dalvik.abha.R
@@ -17,11 +15,17 @@ import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 
 class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBinding::inflate) {
     private val viewModel: GenerateAbhaViewModel by activityViewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as AbdmActivity).hideMenu()
         binding.clickHandler = this
         binding.model = viewModel.abhaDetailModel.value
         renderAadhaarData()
+
+        viewModel.abhaRequestModel.value?.aadhaar?.let {
+            viewModel.clearOtpRequestState(it)
+        }
     }
 
 

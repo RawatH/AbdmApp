@@ -36,6 +36,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     private lateinit var navHostFragment: NavHostFragment
     val viewmodel: GenerateAbhaViewModel by viewModels()
+    private var showMenu = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,8 +64,8 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 //        supportActionBar?.setDisplayShowHomeEnabled(true)
 //        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
 
-        binding.toolbarContainer.toolbar.setNavigationOnClickListener{view ->
-            Toast.makeText(this,"BACK",Toast.LENGTH_SHORT).show()
+        binding.toolbarContainer.toolbar.setNavigationOnClickListener { view ->
+            Toast.makeText(this, "BACK", Toast.LENGTH_SHORT).show()
         }
 
         observeLoader()
@@ -74,32 +75,45 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
             viewmodel.getTranslation(it)
         }
 
-        onBackPressedDispatcher.addCallback(this, object:OnBackPressedCallback(true){
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                Toast.makeText(this@AbdmActivity , "sadsfsfs",Toast.LENGTH_SHORT).show()
-
+                showExitSnackBar()
             }
-
         })
 
     }
 
+    // MENU HANDLING
+    fun hideMenu() {
+        showMenu = false
+        invalidateOptionsMenu()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.abdm_menu, menu);
+        if (showMenu) {
+            menuInflater.inflate(R.menu.abdm_menu, menu)
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if(item.itemId == R.id.close){
-            val msg = LanguageManager.getTranslatedValue(TranslationKey.PROCEED_CLOSE)
-            Snackbar.make(findViewById(android.R.id.content),msg,Snackbar.LENGTH_LONG)
-                .setAction(LanguageManager.getTranslatedValue(TranslationKey.CLOSE)) {
-                    showMessageAndDispatchResult(TranslationKey.USER_ABORTED)
-                }.show();
+        return if (item.itemId == R.id.close) {
+            showExitSnackBar()
             true
-        }else {
+        } else {
             super.onOptionsItemSelected(item)
         }
+    }
+
+    /**
+     * Exit snackbar
+     */
+    private fun showExitSnackBar() {
+        val msg = LanguageManager.getTranslatedValue(TranslationKey.PROCEED_CLOSE)
+        Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_LONG)
+            .setAction(LanguageManager.getTranslatedValue(TranslationKey.YES)) {
+                showMessageAndDispatchResult(TranslationKey.USER_ABORTED)
+            }.show();
     }
 
     /**
@@ -109,9 +123,9 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         intent.extras?.containsKey("abdm_api_token")?.let { tokenPresent ->
             if (tokenPresent) {
                 intent.extras?.getString("abdm_api_token")?.let {
-                    if(it.isEmpty()){
+                    if (it.isEmpty()) {
                         showMessageAndDispatchResult(TranslationKey.TOKEN_MISSING.toString())
-                    }else {
+                    } else {
                         AbdmApplication.API_TOKEN = it
                     }
                 }
@@ -203,9 +217,9 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
 
     private fun dispatchResult(intent: Intent) {
         val resultString = intent.run {
-             "\nVerified =  " +getStringExtra("verified") +
-                     "\nCode = " +getIntExtra("code",-1)+
-                     "\nMessage = " +getStringExtra("message")
+            "\nVerified =  " + getStringExtra("verified") +
+                    "\nCode = " + getIntExtra("code", -1) +
+                    "\nMessage = " + getStringExtra("message")
         }
         Timber.d("---- RESULT ----${resultString}")
 
@@ -229,7 +243,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
 
-    fun showMessageAndDispatchResult(msgKey:String){
+    fun showMessageAndDispatchResult(msgKey: String) {
         val msg = LanguageManager.getTranslatedValue(msgKey)
         DialogUtility.showDialog(
             this@AbdmActivity,
@@ -239,7 +253,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         )
     }
 
-    fun showMessageAndDispatchResult(msgKey:TranslationKey){
+    fun showMessageAndDispatchResult(msgKey: TranslationKey) {
         val msg = LanguageManager.getTranslatedValue(msgKey)
         DialogUtility.showDialog(
             this@AbdmActivity,

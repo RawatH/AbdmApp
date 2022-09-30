@@ -106,7 +106,7 @@ enum class TranslationKey {
     REQ_DATA_MISSING,
     AUTH_METHODS_NOT_RECEIVED,
     PROCEED_CLOSE,
-    CLOSE,
+    YES,
     USER_ABORTED
 }
 
