@@ -10,6 +10,7 @@ import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.flow.callbackFlow
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.utility.NetworkHelper
+import org.commcare.dalvik.domain.model.TranslationKey
 
 abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflater: LayoutInflater) -> B) :
     Fragment(), View.OnClickListener {
@@ -41,7 +42,7 @@ abstract class BaseFragment<B : ViewBinding>(val bindingInflater: (layoutInflate
         val hasConnection = NetworkHelper.isNetworkAvailable(requireActivity())
 
         if(!hasConnection){
-            (activity as AbdmActivity).showConnectivityDialog()
+            (activity as AbdmActivity).showMessageAndDispatchResult(TranslationKey.NO_INTERNET.toString())
         }
         return hasConnection
     }

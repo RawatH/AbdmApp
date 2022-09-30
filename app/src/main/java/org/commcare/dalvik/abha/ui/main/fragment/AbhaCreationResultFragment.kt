@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import org.commcare.dalvik.abha.R
@@ -53,7 +55,7 @@ class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBin
             putExtra("abha_id", binding.model?.healthIdNumber)
             putExtra("code", AbdmResponseCode.SUCCESS.value)
             putExtra("verified", "success")
-            putExtra("message", "")
+            putExtra("message", "success")
             if (binding.shareWithCC.isChecked) {
                 putExtra("aadhaarData", binding.model?.data?.toString())
             }

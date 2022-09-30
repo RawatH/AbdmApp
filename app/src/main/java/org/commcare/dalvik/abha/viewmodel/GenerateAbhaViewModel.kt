@@ -468,6 +468,27 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Reset block state
      */
+    fun clearOtpRequestState(key: String) {
+        abhaRequestModel.value?.let {
+            viewModelScope.launch {
+                saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
+                    if (it != null) {
+                        val savedJson = Gson().fromJson(it, JsonObject::class.java)
+                        if (savedJson.get(key) != null) {
+                            savedJson.remove(key)
+                            Timber.d("----- OTP STATE  CLEARED ------ \n ${key}")
+                            saveData(PrefKeys.OTP_REQUEST.getKey(), savedJson.toString())
+                        }
+                    }
+                    true
+                }
+            }
+        }
+    }
+
+    /**
+     * Reset block state
+     */
     fun clearBlockState(key: String) {
         abhaRequestModel.value?.let {
             viewModelScope.launch {
@@ -604,15 +625,6 @@ class GenerateAbhaViewModel @Inject constructor(
             }
             true
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        reset()
-    }
-
-    private fun reset() {
-
     }
 
 }

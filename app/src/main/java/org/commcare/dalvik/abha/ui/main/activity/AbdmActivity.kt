@@ -2,7 +2,11 @@ package org.commcare.dalvik.abha.ui.main.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
@@ -10,7 +14,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,9 +58,15 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         inflateNavGraph()
-        setupActionBarWithNavController(navController)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
+//        setupActionBarWithNavController(navController)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+//        supportActionBar?.setDisplayShowHomeEnabled(true)
+//        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
+
+        binding.toolbarContainer.toolbar.setNavigationOnClickListener{view ->
+            Toast.makeText(this,"BACK",Toast.LENGTH_SHORT).show()
+        }
+
         observeLoader()
         observeBlockedOtpRequest()
 
@@ -64,6 +74,32 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
             viewmodel.getTranslation(it)
         }
 
+        onBackPressedDispatcher.addCallback(this, object:OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                Toast.makeText(this@AbdmActivity , "sadsfsfs",Toast.LENGTH_SHORT).show()
+
+            }
+
+        })
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.abdm_menu, menu);
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if(item.itemId == R.id.close){
+            val msg = LanguageManager.getTranslatedValue(TranslationKey.PROCEED_CLOSE)
+            Snackbar.make(findViewById(android.R.id.content),msg,Snackbar.LENGTH_LONG)
+                .setAction(LanguageManager.getTranslatedValue(TranslationKey.CLOSE)) {
+                    showMessageAndDispatchResult(TranslationKey.USER_ABORTED)
+                }.show();
+            true
+        }else {
+            super.onOptionsItemSelected(item)
+        }
     }
 
     /**
@@ -73,15 +109,19 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         intent.extras?.containsKey("abdm_api_token")?.let { tokenPresent ->
             if (tokenPresent) {
                 intent.extras?.getString("abdm_api_token")?.let {
-                    AbdmApplication.API_TOKEN = it
+                    if(it.isEmpty()){
+                        showMessageAndDispatchResult(TranslationKey.TOKEN_MISSING.toString())
+                    }else {
+                        AbdmApplication.API_TOKEN = it
+                    }
                 }
             } else {
-                dispatchResult(getErrorIntent("API token missing"))
+                showMessageAndDispatchResult(TranslationKey.TOKEN_MISSING.toString())
             }
         }
 
         if (intent.extras?.containsKey("mobile_number") == false && intent.extras?.containsKey("abha_id") == false) {
-            dispatchResult(getErrorIntent("Missing Mobile number / ABHA ID"))
+            showMessageAndDispatchResult(TranslationKey.REQ_DATA_MISSING.toString())
         }
 
     }
@@ -96,7 +136,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
                     DialogUtility.showDialog(
                         this@AbdmActivity,
                         resources.getString(R.string.app_blocked, it.getTimeLeftToUnblock()),
-                        { dispatchResult(getBlockedIntent("Blocked ,multiple OTP requested.")) },
+                        { dispatchResult(getErrorIntent("Blocked ,multiple OTP requested.")) },
                         DialogType.Blocking
                     )
                 }
@@ -162,6 +202,13 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
     private fun dispatchResult(intent: Intent) {
+        val resultString = intent.run {
+             "\nVerified =  " +getStringExtra("verified") +
+                     "\nCode = " +getIntExtra("code",-1)+
+                     "\nMessage = " +getStringExtra("message")
+        }
+        Timber.d("---- RESULT ----${resultString}")
+
         setResult(111, intent)
         finish()
     }
@@ -172,11 +219,6 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         putExtra("message", msg)
     }
 
-    private fun getBlockedIntent(msg: String) = Intent().apply {
-        putExtra("verified", "false")
-        putExtra("code", AbdmResponseCode.FAILURE.value)
-        putExtra("message", msg)
-    }
 
     fun showBlockerDialog(msg: String) {
         DialogUtility.showDialog(
@@ -187,12 +229,22 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
 
-    fun showConnectivityDialog() {
-        val msg = LanguageManager.getTranslatedValue(TranslationKey.NO_INTERNET)
+    fun showMessageAndDispatchResult(msgKey:String){
+        val msg = LanguageManager.getTranslatedValue(msgKey)
         DialogUtility.showDialog(
             this@AbdmActivity,
             msg,
-            { dispatchResult(getBlockedIntent(msg)) },
+            { dispatchResult(getErrorIntent(msg)) },
+            DialogType.Blocking
+        )
+    }
+
+    fun showMessageAndDispatchResult(msgKey:TranslationKey){
+        val msg = LanguageManager.getTranslatedValue(msgKey)
+        DialogUtility.showDialog(
+            this@AbdmActivity,
+            msg,
+            { dispatchResult(getErrorIntent(msg)) },
             DialogType.Blocking
         )
     }

@@ -20,6 +20,8 @@ import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
 import org.commcare.dalvik.domain.model.LanguageManager
+import org.commcare.dalvik.domain.model.TranslationKey
+import timber.log.Timber
 
 class SelectAuthenticationFragment :
     BaseFragment<SelectAuthMethodBinding>(SelectAuthMethodBinding::inflate),
@@ -37,7 +39,7 @@ class SelectAuthenticationFragment :
     }
 
     private fun fetchAuthMehtods() {
-        if(hasNetworkConnectivity()) {
+        if (hasNetworkConnectivity()) {
             arguments?.getString("abha_id")?.let {
                 viewModel.getAuthenticationMethods(it)
             }
@@ -53,25 +55,38 @@ class SelectAuthenticationFragment :
                             when (it.requestType) {
                                 RequestType.AUTH_METHODS -> {
                                     val authList = mutableListOf<String>()
-                                    it.data.getAsJsonArray("auth_methods")
-                                        .forEach {
+                                    val sortedAuthList =  mutableListOf<String>()
+                                    try {
+                                        it.data?.getAsJsonArray("auth_methods").forEach {
                                             if (filter.contains(it.asString)) {
-                                                authList.add(LanguageManager.getTranslatedValue(it.asString))
+                                                authList.add(it.asString)
                                             }
                                         }
+                                        authList.sort()
+                                        authList.forEach { authType ->
+                                            if (filter.contains(authType)) {
+                                                sortedAuthList.add(LanguageManager.getTranslatedValue(authType))
+                                            }
+                                        }
+
+                                    } catch (e: Exception) {
+                                        (activity as AbdmActivity).showMessageAndDispatchResult(TranslationKey.AUTH_METHODS_NOT_RECEIVED)
+                                        Timber.d("Auth methods not received")
+                                    }
                                     val adapter =
                                         ArrayAdapter(
                                             requireContext(),
                                             R.layout.dropdown_item,
-                                            authList
+                                            sortedAuthList
                                         )
                                     (binding.authSelection as? MaterialAutoCompleteTextView)?.apply {
                                         setAdapter(adapter)
                                         setOnItemClickListener(this@SelectAuthenticationFragment)
-                                        if(authList.size == 1){
-                                            setText(adapter.getItem(0).toString(),false)
+                                        if (authList.size == 1) {
+                                            setText(adapter.getItem(0).toString(), false)
                                         }
                                     }
+
 
                                 }
                             }
@@ -104,9 +119,7 @@ class SelectAuthenticationFragment :
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         parent?.getItemAtPosition(position).toString().let {
-            viewModel.selectedAuthMethod = if (it.lowercase().contains("mobile")) {
-                filter[1]
-            } else filter[0]
+            viewModel.selectedAuthMethod = filter[position]
             binding.startVerfication.isEnabled = true
         }
     }
@@ -115,7 +128,7 @@ class SelectAuthenticationFragment :
         viewModel.selectedAuthMethod?.let {
             if (it == "AADHAAR_OTP") {
                 val bundle = bundleOf(
-                    "authMethod" to viewModel.selectedAuthMethod ,
+                    "authMethod" to viewModel.selectedAuthMethod,
                     "verificationMode" to VerificationMode.CONFIRM_AADHAAR_OTP,
                     "abhaId" to arguments?.getString("abha_id")
                 )
@@ -125,7 +138,7 @@ class SelectAuthenticationFragment :
                 )
             } else {
                 val bundle = bundleOf(
-                    "authMethod" to viewModel.selectedAuthMethod ,
+                    "authMethod" to viewModel.selectedAuthMethod,
                     "verificationMode" to VerificationMode.CONFIRM_MOBILE_OTP,
                     "abhaId" to arguments?.getString("abha_id")
                 )

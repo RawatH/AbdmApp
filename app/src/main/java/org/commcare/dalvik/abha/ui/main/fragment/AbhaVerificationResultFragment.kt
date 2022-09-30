@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import org.commcare.dalvik.abha.databinding.AbhaVerificationResultBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.AbdmResponseCode
@@ -20,15 +21,26 @@ class AbhaVerificationResultFragment :
             binding.model = it
         }
 
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                dispatchResult()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
     }
 
     override fun onClick(view: View?) {
         super.onClick(view)
+       dispatchResult()
+    }
+
+    private fun dispatchResult(){
         val intent = Intent().apply {
-            putExtra("health_id",binding.model?.healthId)
+            putExtra("abha_id",binding.model?.healthId)
             putExtra("code", AbdmResponseCode.SUCCESS.value)
             putExtra("verified", binding.model?.status)
-            putExtra("message", "")
+            putExtra("message", "Verification completed.")
         }
 
         (activity as AbdmActivity).onAbhaNumberVerification(intent)
