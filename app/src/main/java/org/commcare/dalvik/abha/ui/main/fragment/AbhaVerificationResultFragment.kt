@@ -8,13 +8,13 @@ import androidx.fragment.app.activityViewModels
 import org.commcare.dalvik.abha.databinding.AbhaVerificationResultBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.AbdmResponseCode
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 import org.commcare.dalvik.domain.model.AbhaVerificationResultModel
 
 class AbhaVerificationResultFragment :
     BaseFragment<AbhaVerificationResultBinding>(AbhaVerificationResultBinding::inflate) {
 
-    private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    private val viewModel: AbdmViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

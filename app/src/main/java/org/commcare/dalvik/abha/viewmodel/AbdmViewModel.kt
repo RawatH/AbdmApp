@@ -20,7 +20,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class GenerateAbhaViewModel @Inject constructor(
+class AbdmViewModel @Inject constructor(
     private val generateAuthOtpUsecase: GenerateAuthOtpUsecase,
     private val authenticationMethodsUsecase: GetAuthenticationMethodsUsecase,
     private val reqAadhaarOtpUsecase: RequestAadhaarOtpUsecase,
@@ -318,7 +318,6 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Confirm Auth AADHAAR OTP
      */
-
     fun confirmAadhaarAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel) {
         viewModelScope.launch {
             confirmAadhaarOtpUsecase.execute(verifyOOtpRequestModel).collect {
@@ -362,7 +361,6 @@ class GenerateAbhaViewModel @Inject constructor(
     /**
      * Confirm Auth MOBILE OTP
      */
-
     fun confirmMobileAuthOtp(verifyOOtpRequestModel: VerifyOtpRequestModel) {
         viewModelScope.launch {
             confirmMobileOtpUsecase.execute(verifyOOtpRequestModel).collect {
@@ -484,6 +482,26 @@ class GenerateAbhaViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun getOtpRequestCount(key:String) = flow {
+            saveDataUsecase.executeFetch(PrefKeys.OTP_REQUEST.getKey()).first {
+                if (it != null) {
+                    val savedJson = Gson().fromJson(it, JsonObject::class.java)
+                    if (savedJson.get(key) != null) {
+                        val otpRequestModel = Gson().fromJson(
+                            savedJson.get(key).asString,
+                            OtpRequestCallModel::class.java
+                        )
+
+                        emit(otpRequestModel.counter)
+                        Timber.d("----- OTP COUNT => ${otpRequestModel.counter} ------ \n ${key}")
+                    }
+                }else {
+                    emit(0)
+                }
+                true
+            }
     }
 
     /**

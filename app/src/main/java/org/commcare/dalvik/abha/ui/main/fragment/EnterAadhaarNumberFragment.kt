@@ -19,14 +19,14 @@ import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.utility.checkMobileFirstNumber
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 import org.commcare.dalvik.abha.viewmodel.OtpCallState
 import timber.log.Timber
 
 @AndroidEntryPoint
 class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaarBinding::inflate) {
 
-    private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    private val viewModel: AbdmViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

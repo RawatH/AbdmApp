@@ -14,14 +14,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.VerifyMobileOtpBinding
-import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 import org.commcare.dalvik.abha.viewmodel.OtpCallState
 import org.commcare.dalvik.abha.viewmodel.RequestType
 import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
@@ -35,7 +34,7 @@ import timber.log.Timber
 class VerifyMobileOtpFragment :
     BaseFragment<VerifyMobileOtpBinding>(VerifyMobileOtpBinding::inflate) {
 
-    private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    private val viewModel: AbdmViewModel by activityViewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,7 +89,7 @@ class VerifyMobileOtpFragment :
     }
 
     /**
-     * Request Request MOBILE_OTP
+     * Request MOBILE_OTP
      */
     private fun requestMobileOtp() {
         lifecycleScope.launch{
@@ -110,7 +109,7 @@ class VerifyMobileOtpFragment :
     }
 
     /**
-     * Request AADHAAR AUTH_OTP
+     * Request MOBILE AUTH_OTP
      */
     private fun requestMobileAuthOtp() {
         lifecycleScope.launch{
@@ -124,6 +123,48 @@ class VerifyMobileOtpFragment :
                             is OtpCallState.OtpReqBlocked -> {
                                 viewModel.otpRequestBlocked.value = it.otpRequestCallModel
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Verify MOBILE OTP
+     */
+    private fun verifyMobileOtp() {
+        lifecycleScope.launch {
+            viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                viewModel.checkForBlockedState(aadhaarKey).collect {
+                    when (it) {
+                        OtpCallState.OtpReqAvailable -> {
+                            viewModel.verifyMobileOtp(getMobileOtpRequestModel())
+                        }
+                        is OtpCallState.OtpReqBlocked -> {
+                            binding.verifyOtp.isEnabled = false
+//                            viewModel.otpRequestBlocked.value = it.otpRequestCallModel
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Confirm MOBILE OTP
+     */
+    private fun confirmMobileAuthOtp() {
+        lifecycleScope.launch {
+            arguments?.getString("abhaId")?.let { aadhaarKey ->
+                viewModel.checkForBlockedState(aadhaarKey).collect {
+                    when (it) {
+                        OtpCallState.OtpReqAvailable -> {
+                            viewModel.confirmMobileAuthOtp(getMobileOtpRequestModel())
+                        }
+                        is OtpCallState.OtpReqBlocked -> {
+                            binding.verifyOtp.isEnabled = false
+//                            viewModel.otpRequestBlocked.value = it.otpRequestCallModel
                         }
                     }
                 }

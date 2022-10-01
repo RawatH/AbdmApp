@@ -11,10 +11,10 @@ import org.commcare.dalvik.abha.databinding.AbhaDetailBinding
 import org.commcare.dalvik.abha.databinding.KeyValueBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.AbdmResponseCode
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 
 class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBinding::inflate) {
-    private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    private val viewModel: AbdmViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
@@ -14,6 +13,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ import org.commcare.dalvik.abha.databinding.AbdmActivityBinding
 import org.commcare.dalvik.abha.utility.DialogType
 import org.commcare.dalvik.abha.utility.DialogUtility
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 import org.commcare.dalvik.data.network.HeaderInterceptor
 import org.commcare.dalvik.domain.model.LanguageManager
 import org.commcare.dalvik.domain.model.TranslationKey
@@ -35,7 +35,7 @@ import java.io.Serializable
 class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::inflate) {
 
     private lateinit var navHostFragment: NavHostFragment
-    val viewmodel: GenerateAbhaViewModel by viewModels()
+    val viewmodel: AbdmViewModel by viewModels()
     private var showMenu = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,14 +59,14 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         inflateNavGraph()
-//        setupActionBarWithNavController(navController)
+        setupActionBarWithNavController(navController)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
-//        supportActionBar?.setDisplayShowHomeEnabled(true)
-//        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
 
-        binding.toolbarContainer.toolbar.setNavigationOnClickListener { view ->
-            Toast.makeText(this, "BACK", Toast.LENGTH_SHORT).show()
-        }
+//        binding.toolbarContainer.toolbar.setNavigationOnClickListener { view ->
+//            Toast.makeText(this, "BACK", Toast.LENGTH_SHORT).show()
+//        }
 
         observeLoader()
         observeBlockedOtpRequest()

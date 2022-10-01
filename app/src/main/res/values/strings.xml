@@ -26,7 +26,7 @@
     <string name="decline">Decline</string>
     <string name="accept">Accept</string>
     <string name="ok">Ok</string>
-    <string name="app_blocked">OTP request blocked for %s .</string>
+    <string name="app_blocked">OTP request blocked for %s.</string>
     <string name="close">Close</string>
 
 </resources>

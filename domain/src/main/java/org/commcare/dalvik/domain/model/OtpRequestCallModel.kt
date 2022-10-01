@@ -42,6 +42,11 @@ data class OtpRequestCallModel(
         val timeLeft = OTP_BLOCK_TIME - (System.currentTimeMillis() - blockedTS)
         val minutesLeft = (timeLeft / 1000) / 60
         val secondsLeft = (timeLeft / 1000) % 60
-        return minutesLeft.toString() + "minutes : ${secondsLeft}sec"
+
+        if(minutesLeft >= 1) {
+            return "$minutesLeft minutes"//: ${secondsLeft} sec"
+        }else{
+            return "1 minute."
+        }
     }
 }

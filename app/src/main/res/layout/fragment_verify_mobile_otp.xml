@@ -9,7 +9,7 @@
 
         <variable
             name="model"
-            type="org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel" />
+            type="org.commcare.dalvik.abha.viewmodel.AbdmViewModel" />
 
         <variable
             name="clickHandler"

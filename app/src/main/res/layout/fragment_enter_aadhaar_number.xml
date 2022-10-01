@@ -7,7 +7,7 @@
         <import type="org.commcare.dalvik.domain.model.TranslationKey"/>
         <variable
             name="model"
-            type="org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel" />
+            type="org.commcare.dalvik.abha.viewmodel.AbdmViewModel" />
         <variable
             name="clickHandler"
             type="org.commcare.dalvik.abha.ui.main.fragment.EnterAadhaarNumberFragment" />

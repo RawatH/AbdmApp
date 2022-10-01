@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,12 +14,12 @@ import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.StartAbhaVerificationBinding
 import org.commcare.dalvik.abha.model.AbhaRequestModel
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 import org.commcare.dalvik.abha.viewmodel.OtpCallState
 
 class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>(StartAbhaVerificationBinding::inflate) {
 
-    private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    private val viewModel: AbdmViewModel by activityViewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -29,12 +27,6 @@ class StartAbhaVerificationFragment():BaseFragment<StartAbhaVerificationBinding>
         binding.clickHandler = this
         populateIntentData()
         attachUiStateObserver()
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                Toast.makeText(requireContext(),"11111111", Toast.LENGTH_SHORT).show()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
     private fun populateIntentData() {

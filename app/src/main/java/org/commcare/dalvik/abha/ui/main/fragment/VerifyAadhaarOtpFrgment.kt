@@ -19,7 +19,7 @@ import org.commcare.dalvik.abha.ui.main.custom.OtpTimerState
 import org.commcare.dalvik.abha.utility.AppConstants
 import org.commcare.dalvik.abha.utility.observeText
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 import org.commcare.dalvik.abha.viewmodel.OtpCallState
 import org.commcare.dalvik.abha.viewmodel.RequestType
 import org.commcare.dalvik.data.util.PrefKeys
@@ -31,7 +31,7 @@ import timber.log.Timber
 class VerifyAadhaarOtpFragment :
     BaseFragment<VerifyAadhaarOtpBinding>(VerifyAadhaarOtpBinding::inflate) {
 
-    private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    private val viewModel: AbdmViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -99,6 +99,41 @@ class VerifyAadhaarOtpFragment :
                         is OtpCallState.OtpReqBlocked -> {
                             viewModel.otpRequestBlocked.value = it.otpRequestCallModel
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Verify AADHAAR OTP
+     */
+    private fun verifyAadhaarOtp() {
+        lifecycleScope.launch {
+            viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+                viewModel.getOtpRequestCount(aadhaarKey).collect { otpCount ->
+                    if(otpCount < 5){
+                        viewModel.verifyAadhaarOtp(getAadhaarOtpVeriyModel())
+                    }else{
+                        binding.verifyOtp.isEnabled = false
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Confirm AADHAAR AUTH OTP
+     */
+    private fun confirmAadhaarAuthOtp() {
+        lifecycleScope.launch {
+            arguments?.getString("abhaId")?.let { abhaId ->
+
+                viewModel.getOtpRequestCount(abhaId).collect { otpCount ->
+                    if(otpCount < 5){
+                        viewModel.confirmAadhaarAuthOtp(getAadhaarOtpVeriyModel())
+                    }else{
+                        binding.verifyOtp.isEnabled = false
                     }
                 }
             }

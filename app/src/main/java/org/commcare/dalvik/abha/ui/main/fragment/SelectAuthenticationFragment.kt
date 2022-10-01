@@ -1,12 +1,9 @@
 package org.commcare.dalvik.abha.ui.main.fragment
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.annotation.Nullable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -20,7 +17,7 @@ import org.commcare.dalvik.abha.databinding.SelectAuthMethodBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
 import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaViewModel
+import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
 import org.commcare.dalvik.abha.viewmodel.RequestType
 import org.commcare.dalvik.domain.model.LanguageManager
 import org.commcare.dalvik.domain.model.TranslationKey
@@ -30,7 +27,7 @@ class SelectAuthenticationFragment :
     BaseFragment<SelectAuthMethodBinding>(SelectAuthMethodBinding::inflate),
     AdapterView.OnItemClickListener {
 
-    private val viewModel: GenerateAbhaViewModel by activityViewModels()
+    private val viewModel: AbdmViewModel by activityViewModels()
     val filter = listOf("AADHAAR_OTP", "MOBILE_OTP")
 
 
