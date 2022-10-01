@@ -106,7 +106,7 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
     }
 
     /**
-     * Exit snackbar
+     * Exit message
      */
     private fun showExitSnackBar() {
         val msg = LanguageManager.getTranslatedValue(TranslationKey.PROCEED_CLOSE)
