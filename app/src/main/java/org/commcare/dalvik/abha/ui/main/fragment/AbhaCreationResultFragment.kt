@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import org.commcare.dalvik.abha.R
@@ -23,9 +24,12 @@ class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBin
         binding.model = viewModel.abhaDetailModel.value
         renderAadhaarData()
 
-        viewModel.abhaRequestModel.value?.aadhaar?.let {
-            viewModel.clearOtpRequestState(it)
-        }
+
+        (activity as AbdmActivity).hideBack()
+
+//        viewModel.abhaRequestModel.value?.aadhaar?.let {
+//            viewModel.clearOtpRequestState(it)
+//        }
     }
 
 
@@ -54,12 +58,15 @@ class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBin
 
     override fun onClick(view: View?) {
         super.onClick(view)
+        dispatchResult()
+    }
 
+    private fun dispatchResult() {
         val intent = Intent().apply {
             putExtra("abha_id", binding.model?.healthIdNumber)
             putExtra("code", AbdmResponseCode.SUCCESS.value)
             putExtra("verified", "success")
-            putExtra("message", "success")
+            putExtra("message", "ABHA creation completed.")
             if (binding.shareWithCC.isChecked) {
                 putExtra("aadhaarData", binding.model?.data?.toString())
             }

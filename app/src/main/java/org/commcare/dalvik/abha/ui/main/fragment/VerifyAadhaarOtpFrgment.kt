@@ -112,9 +112,9 @@ class VerifyAadhaarOtpFragment :
         lifecycleScope.launch {
             viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
                 viewModel.getOtpRequestCount(aadhaarKey).collect { otpCount ->
-                    if(otpCount < 5){
+                    if (otpCount < 5) {
                         viewModel.verifyAadhaarOtp(getAadhaarOtpVeriyModel())
-                    }else{
+                    } else {
                         binding.verifyOtp.isEnabled = false
                     }
                 }
@@ -130,9 +130,9 @@ class VerifyAadhaarOtpFragment :
             arguments?.getString("abhaId")?.let { abhaId ->
 
                 viewModel.getOtpRequestCount(abhaId).collect { otpCount ->
-                    if(otpCount < 5){
+                    if (otpCount < 5) {
                         viewModel.confirmAadhaarAuthOtp(getAadhaarOtpVeriyModel())
-                    }else{
+                    } else {
                         binding.verifyOtp.isEnabled = false
                     }
                 }
@@ -250,21 +250,22 @@ class VerifyAadhaarOtpFragment :
                         is GenerateAbhaUiState.Error -> {
                             when (it.requestType) {
 
-                                RequestType.GENERATE_AUTH_OTP ->{
+                                RequestType.GENERATE_AUTH_OTP -> {
                                     binding.verifyOtp.isEnabled =
                                         binding.aadhaarOtpEt.text?.isNotEmpty() ?: false
-
-                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
-                                        startResendTimer(abhaIdKey)
-                                    }
+                                    binding.timeProgress.startTimer()
+//                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+//                                        startResendTimer(abhaIdKey)
+//                                    }
                                 }
 
                                 RequestType.AADHAAR_OTP -> {
                                     binding.verifyOtp.isEnabled =
                                         binding.aadhaarOtpEt.text?.isNotEmpty() ?: false
-                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
-                                        startResendTimer(aadhaarKey)
-                                    }
+                                    binding.timeProgress.startTimer()
+//                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+//                                        startResendTimer(aadhaarKey)
+//                                    }
                                 }
 
                                 RequestType.CONFIRM_AUTH_AADHAAR_OTP,
@@ -286,22 +287,24 @@ class VerifyAadhaarOtpFragment :
                          */
                         is GenerateAbhaUiState.AbdmError -> {
                             when (it.requestType) {
-                                RequestType.GENERATE_AUTH_OTP->{
+                                RequestType.GENERATE_AUTH_OTP -> {
                                     binding.verifyOtp.isEnabled =
                                         binding.aadhaarOtpEt.text?.isNotEmpty() ?: false
+                                    binding.timeProgress.startTimer()
 
-                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
-                                        startResendTimer(abhaIdKey)
-                                    }
+//                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+//                                        startResendTimer(abhaIdKey)
+//                                    }
                                 }
 
                                 RequestType.AADHAAR_OTP -> {
                                     binding.verifyOtp.isEnabled =
                                         binding.aadhaarOtpEt.text?.isNotEmpty() ?: false
+                                    binding.timeProgress.startTimer()
 
-                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
-                                        startResendTimer(aadhaarKey)
-                                    }
+//                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+//                                        startResendTimer(aadhaarKey)
+//                                    }
                                 }
 
                                 RequestType.CONFIRM_AUTH_AADHAAR_OTP,
@@ -382,12 +385,18 @@ class VerifyAadhaarOtpFragment :
     private fun navigateToNextScreen(srcRequestType: RequestType, bundle: Bundle = bundleOf()) {
         when (srcRequestType) {
             RequestType.CONFIRM_AUTH_MOBILE_OTP -> {
+                viewModel.abhaRequestModel.value?.abhaId?.let {
+                    viewModel.clearOtpRequestState(it)
+                }
                 findNavController().navigate(
                     R.id.action_verifyAadhaarOtpFragment_to_abhaVerificationResultFragment,
                     bundle
                 )
             }
             RequestType.AADHAAR_OTP_VERIFY -> {
+                viewModel.abhaRequestModel.value?.aadhaar?.let {
+                    viewModel.clearOtpRequestState(it)
+                }
                 val bundle = bundleOf("verificationMode" to VerificationMode.VERIFY_MOBILE_OTP)
                 findNavController().navigate(
                     R.id.action_verifyAadhaarOtpFragment_to_verifyMobileOtpFragment,

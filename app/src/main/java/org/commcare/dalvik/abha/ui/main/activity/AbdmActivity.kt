@@ -89,6 +89,11 @@ class AbdmActivity : BaseActivity<AbdmActivityBinding>(AbdmActivityBinding::infl
         invalidateOptionsMenu()
     }
 
+    fun hideBack(){
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (showMenu) {
             menuInflater.inflate(R.menu.abdm_menu, menu)

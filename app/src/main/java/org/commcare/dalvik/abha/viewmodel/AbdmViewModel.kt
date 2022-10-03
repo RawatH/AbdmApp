@@ -621,18 +621,19 @@ class AbdmViewModel @Inject constructor(
                         OtpRequestCallModel::class.java
                     )
 
+                    if (otpRequestCallModel.isBlocked()) {
+                        emit(OtpCallState.OtpReqBlocked(otpRequestCallModel))
+                    } else {
+                        emit(OtpCallState.OtpReqAvailable)
+                    }
+
+                    //Try unblocking
                     val wasUnblocked = otpRequestCallModel.tryUnBlocking()
 
                     if(wasUnblocked){
                         savedJson.remove(key)
                         savedJson.addProperty(key, Gson().toJson(otpRequestCallModel))
                         saveData(PrefKeys.OTP_REQUEST.getKey(), savedJson.toString())
-                    }
-
-                    if (otpRequestCallModel.isBlocked()) {
-                        emit(OtpCallState.OtpReqBlocked(otpRequestCallModel))
-                    } else {
-                        emit(OtpCallState.OtpReqAvailable)
                     }
 
                 } else {

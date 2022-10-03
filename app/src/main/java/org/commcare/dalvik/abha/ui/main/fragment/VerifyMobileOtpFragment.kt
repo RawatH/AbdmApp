@@ -262,16 +262,18 @@ class VerifyMobileOtpFragment :
                             when (it.requestType) {
                                 RequestType.GENERATE_AUTH_OTP ->{
                                     binding.mobileOtpEt.isEnabled = true
-                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
-                                        startResendTimer(abhaIdKey)
-                                    }
+                                    binding.timeProgress.startTimer()
+//                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+//                                        startResendTimer(abhaIdKey)
+//                                    }
                                 }
 
                                 RequestType.MOBILE_OTP -> {
                                     binding.mobileOtpEt.isEnabled = true
-                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
-                                        startResendTimer(aadhaarKey)
-                                    }
+                                    binding.timeProgress.startTimer()
+//                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+//                                        startResendTimer(aadhaarKey)
+//                                    }
                                 }
 
                                 RequestType.CONFIRM_AUTH_MOBILE_OTP,
@@ -290,15 +292,17 @@ class VerifyMobileOtpFragment :
                         is GenerateAbhaUiState.AbdmError -> {
                             when (it.requestType) {
                                 RequestType.GENERATE_AUTH_OTP ->{
-                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
-                                        startResendTimer(abhaIdKey)
-                                    }
+                                    binding.timeProgress.startTimer()
+//                                    viewModel.abhaRequestModel.value?.abhaId?.let { abhaIdKey ->
+//                                        startResendTimer(abhaIdKey)
+//                                    }
                                 }
 
                                 RequestType.MOBILE_OTP -> {
-                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
-                                        startResendTimer(aadhaarKey)
-                                    }
+                                    binding.timeProgress.startTimer()
+//                                    viewModel.abhaRequestModel.value?.aadhaar?.let { aadhaarKey ->
+//                                        startResendTimer(aadhaarKey)
+//                                    }
                                 }
 
                                 RequestType.CONFIRM_AUTH_MOBILE_OTP,
@@ -379,6 +383,9 @@ class VerifyMobileOtpFragment :
 
         when (srcRequestType) {
             RequestType.CONFIRM_AUTH_MOBILE_OTP -> {
+                viewModel.abhaRequestModel.value?.abhaId?.let {
+                    viewModel.clearOtpRequestState(it)
+                }
                 findNavController().navigate(
                     R.id.action_verifyMobileOtpFragment_to_abhaVerificationResultFragment,
                     bundle
@@ -386,6 +393,9 @@ class VerifyMobileOtpFragment :
             }
 
             RequestType.MOBILE_OTP_VERIFY -> {
+                viewModel.abhaRequestModel.value?.aadhaar?.let {
+                    viewModel.clearOtpRequestState(it)
+                }
                 findNavController().navigate(R.id.action_verifyMobileOtpFragment_to_abhaDetailFragment)
             }
 

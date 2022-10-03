@@ -38,29 +38,24 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_end="@dimen/guidelineMargin" />
 
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/nestedScrollView"
+
+            <LinearLayout
+                android:id="@+id/aadhaarDataTableLayout"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:background="@color/black"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toTopOf="@+id/shareWithCC"
+                app:layout_constraintEnd_toEndOf="@+id/guideline5"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="@+id/guideline4"
-                app:layout_constraintEnd_toEndOf="@+id/guideline5"
                 app:layout_constraintTop_toBottomOf="@+id/textView4">
 
-                <LinearLayout
-                    android:id="@+id/aadhaarDataTableLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/black"
-                    android:orientation="vertical">
 
+            </LinearLayout>
 
-                </LinearLayout>
-
-            </androidx.core.widget.NestedScrollView>
 
             <Button
                 android:id="@+id/done"
@@ -71,9 +66,9 @@
                 android:layout_marginBottom="8dp"
                 android:onClickListener="@{clickHandler}"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/guideline4"
                 app:layout_constraintEnd_toEndOf="@+id/guideline5"
                 app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
                 app:layout_constraintTop_toBottomOf="@+id/shareWithCC"
                 app:translatedTextKey="@{TranslationKey.RETURN}" />
 
@@ -84,10 +79,10 @@
                 android:layout_height="wrap_content"
                 android:checked="true"
                 app:layout_constraintBottom_toTopOf="@+id/done"
-                app:layout_constraintStart_toStartOf="@+id/guideline4"
                 app:layout_constraintEnd_toEndOf="@+id/guideline5"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintTop_toBottomOf="@+id/nestedScrollView"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                app:layout_constraintTop_toBottomOf="@+id/aadhaarDataTableLayout"
                 app:translatedTextKey="@{TranslationKey.USE_ADHR_DATA_IN_COMMCARE}" />
 
             <TextView

@@ -25,16 +25,18 @@ class AbhaVerificationResultFragment :
             binding.model = it
         }
 
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                dispatchResult()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+//        val callback = object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                dispatchResult()
+//            }
+//        }
+//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
-        viewModel.abhaRequestModel.value?.abhaId?.let {
-            viewModel.clearOtpRequestState(it)
-        }
+        (activity as AbdmActivity).hideBack()
+
+//        viewModel.abhaRequestModel.value?.abhaId?.let {
+//            viewModel.clearOtpRequestState(it)
+//        }
     }
 
     override fun onClick(view: View?) {
@@ -47,7 +49,7 @@ class AbhaVerificationResultFragment :
             putExtra("abha_id", binding.model?.healthId)
             putExtra("code", AbdmResponseCode.SUCCESS.value)
             putExtra("verified", binding.model?.status)
-            putExtra("message", "Verification completed.")
+            putExtra("message", "ABHA verification completed.")
         }
 
         (activity as AbdmActivity).onAbhaNumberVerification(intent)

@@ -40,13 +40,17 @@ data class OtpRequestCallModel(
 
     fun getTimeLeftToUnblock(): String {
         val timeLeft = OTP_BLOCK_TIME - (System.currentTimeMillis() - blockedTS)
-        val minutesLeft = (timeLeft / 1000) / 60
+        var minutesLeft = (timeLeft / 1000) / 60
         val secondsLeft = (timeLeft / 1000) % 60
 
-        if(minutesLeft >= 1) {
-            return "$minutesLeft minutes"//: ${secondsLeft} sec"
-        }else{
-            return "1 minute."
+        if(secondsLeft > 1){
+            minutesLeft += 1
         }
+
+//        if(minutesLeft >= 1) {
+//            return "$minutesLeft minutes"//: ${secondsLeft} sec"
+//        }
+
+        return "$minutesLeft minutes"
     }
 }
