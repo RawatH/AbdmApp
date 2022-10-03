@@ -34,7 +34,6 @@ class EnterAadhaarNumberFragment : BaseFragment<EnterAadhaarBinding>(EnterAadhaa
         binding.clickHandler = this
         attachUiStateObserver()
         populateIntentData()
-        viewModel.abhaRequestModel.value?.aadhaar ="232755042430"
     }
 
 

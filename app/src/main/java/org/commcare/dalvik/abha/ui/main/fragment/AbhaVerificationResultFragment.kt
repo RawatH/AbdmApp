@@ -25,12 +25,12 @@ class AbhaVerificationResultFragment :
             binding.model = it
         }
 
-//        val callback = object : OnBackPressedCallback(true) {
-//            override fun handleOnBackPressed() {
-//                dispatchResult()
-//            }
-//        }
-//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                dispatchResult()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
         (activity as AbdmActivity).hideBack()
 

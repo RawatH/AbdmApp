@@ -24,6 +24,12 @@ class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBin
         binding.model = viewModel.abhaDetailModel.value
         renderAadhaarData()
 
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                dispatchResult()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
         (activity as AbdmActivity).hideBack()
 
