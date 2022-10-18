@@ -1,10 +1,7 @@
 package org.commcare.dalvik.data.services
 
 import com.google.gson.JsonObject
-import org.commcare.dalvik.domain.model.AadhaarOtpRequestModel
-import org.commcare.dalvik.domain.model.GenerateAuthOtpModel
-import org.commcare.dalvik.domain.model.MobileOtpRequestModel
-import org.commcare.dalvik.domain.model.VerifyOtpRequestModel
+import org.commcare.dalvik.domain.model.*
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -25,8 +22,8 @@ interface HqServices {
     @POST("generate_auth_otp")
     suspend fun generateAuthOtp(@Body generateAuthOtpModel: GenerateAuthOtpModel):Response<JsonObject>
 
-    @GET("get_auth_methods")
-    suspend fun getAuthenticationMethods(@Query("health_id") healthId:String):Response<JsonObject>
+    @POST("search_health_id")
+    suspend fun getAuthenticationMethods(@Body authMethodRequestModel: GetAuthMethodRequestModel):Response<JsonObject>
 
     @POST("confirm_with_aadhaar_otp")
     suspend fun confirmAadhaarOtp(@Body verifyOtpRequestModel: VerifyOtpRequestModel):Response<JsonObject>

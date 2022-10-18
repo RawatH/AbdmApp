@@ -411,7 +411,7 @@ class AbdmViewModel @Inject constructor(
                     }
 
                     is HqResponseModel.Success -> {
-                        if (it.value.has("auth_methods")) {
+                        if (it.value.has("authMethods")) {
                             uiState.emit(
                                 GenerateAbhaUiState.Success(
                                     it.value,

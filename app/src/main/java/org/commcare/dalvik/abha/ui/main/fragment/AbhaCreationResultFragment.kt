@@ -71,7 +71,7 @@ class AbhaCreationResultFragment : BaseFragment<AbhaDetailBinding>(AbhaDetailBin
         val intent = Intent().apply {
             putExtra("abha_id", binding.model?.healthIdNumber)
             putExtra("code", AbdmResponseCode.SUCCESS.value)
-            putExtra("verified", "success")
+            putExtra("verified", "true")
             putExtra("message", "ABHA creation completed.")
             if (binding.shareWithCC.isChecked) {
                 putExtra("aadhaarData", binding.model?.data?.toString())

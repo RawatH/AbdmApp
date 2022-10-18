@@ -39,7 +39,7 @@ class TestActivity : AppCompatActivity() {
         val intent = Intent(action).apply {
             putExtras(
                 bundleOf(
-                    "abha_id" to "91766261606756",
+                    "abha_id" to "66543673407500",
                     "lang_code" to lang,
                     "abdm_api_token" to token,
                 )
