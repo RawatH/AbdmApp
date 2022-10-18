@@ -16,11 +16,10 @@ import org.commcare.dalvik.abha.R
 import org.commcare.dalvik.abha.databinding.SelectAuthMethodBinding
 import org.commcare.dalvik.abha.ui.main.activity.AbdmActivity
 import org.commcare.dalvik.abha.ui.main.activity.VerificationMode
-import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.AbdmViewModel
+import org.commcare.dalvik.abha.viewmodel.GenerateAbhaUiState
 import org.commcare.dalvik.abha.viewmodel.RequestType
 import org.commcare.dalvik.domain.model.LanguageManager
-import org.commcare.dalvik.domain.model.TranslationKey
 import timber.log.Timber
 
 class SelectAuthenticationFragment :
@@ -57,7 +56,7 @@ class SelectAuthenticationFragment :
                                     val authList = mutableListOf<String>()
                                     val sortedAuthList =  mutableListOf<String>()
                                     try {
-                                        it.data?.getAsJsonArray("auth_methods").forEach {
+                                        it.data?.getAsJsonArray("authMethods").forEach {
                                             if (filter.contains(it.asString)) {
                                                 authList.add(it.asString)
                                             }
@@ -70,7 +69,7 @@ class SelectAuthenticationFragment :
                                         }
 
                                     } catch (e: Exception) {
-                                        (activity as AbdmActivity).showMessageAndDispatchResult(TranslationKey.AUTH_METHODS_NOT_RECEIVED)
+                                        (activity as AbdmActivity).showMessageAndDispatchResult("No authentication methods received.")
                                         Timber.d("Auth methods not received")
                                     }
                                     val adapter =

@@ -13,7 +13,10 @@ data class MobileOtpRequestModel(
 ) : BaseModel()
 
 data class VerifyOtpRequestModel(val txn_id: String, val otp: String)
+
 data class GenerateAuthOtpModel(
     @SerializedName("health_id") val healthId: String,
     @SerializedName("auth_method") val authMethod: String
 )
+
+data class GetAuthMethodRequestModel( @SerializedName("health_id") val healthId: String)
